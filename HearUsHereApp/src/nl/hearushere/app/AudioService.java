@@ -305,7 +305,6 @@ public class AudioService extends Service implements
 		if (!mSoundsLoaded || Constants.USE_DEBUG_LOCATION) {
 			return;
 		}
-		Log.v(TAG, "-location changed-");
 
 		Runnable playLocationSounds = new Runnable() {
 			@Override
