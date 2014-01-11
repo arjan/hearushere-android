@@ -10,4 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <TextView
+        android:id="@+id/tv_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/notification_bg"
+        android:textColor="@color/notification_fg"
+        android:padding="8dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="TextView" />
+    
+    <ProgressBar 
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        />
+
 </FrameLayout>

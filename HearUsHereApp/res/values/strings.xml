@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">Hear Us Here</string>
     <string name="notification_progress_text">Audio tour in progress. Click to stop.</string>
+    <string name="btn_stop">Stop</string>
+    <string name="btn_about">About this app</string>
+    <string name="load_progress">Loading track %1$d of %2$d…</string>
 </resources>
