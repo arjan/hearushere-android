@@ -167,18 +167,18 @@ public class MainActivity extends Activity implements AudioEventListener,
 			}
 		};
 
-		bindService(service, mServiceConnection, 0);
+		bindService(service, mServiceConnection, BIND_AUTO_CREATE);
 	}
 
 	@Override
-	protected void onDestroy() {
+	protected void onPause() {
 		if (mServiceConnection != null) {
-			unbindService(mServiceConnection);
 			if (mServiceInterface != null) {
 				mServiceInterface.setAudioEventListener(null);
 			}
+			unbindService(mServiceConnection);
 		}
-		super.onDestroy();
+		super.onPause();
 	}
 
 	@Override
@@ -261,7 +261,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		// If Google Play services is available
 		if (ConnectionResult.SUCCESS == resultCode) {
 			// In debug mode, log the status
-			Log.d("Location Updates", "Google Play services is available.");
+			//Log.d("Location Updates", "Google Play services is available.");
 			// Continue
 			return;
 			// Google Play services was not available for some reason
