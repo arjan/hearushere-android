@@ -35,7 +35,7 @@
         </activity>
 
         <service
-            android:name="nl.hearushere.app.AudioService"
+            android:name="nl.hearushere.app.AudioWalkService"
             android:exported="false" />
         <service
             android:name="nl.hearushere.app.net.HttpSpiceService"

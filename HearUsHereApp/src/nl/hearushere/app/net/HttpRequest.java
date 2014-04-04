@@ -30,30 +30,29 @@ public class HttpRequest {
 				java.util.logging.Level.FINEST);
 	}
 
-	public static JsonNode doRequest(String method, String urlPath,
+	public static JsonNode doRequest(String method, String url,
 			String requestJSONBody) throws SpiceException {
 
 		String urlParams = "";
 
 		if (requestJSONBody != null && method.equals(HttpGet.METHOD_NAME)) {
-			//urlParams = "?" + URLEncodedUtils.format(params, "utf-8");
+			// urlParams = "?" + URLEncodedUtils.format(params, "utf-8");
 		}
 
 		HttpUriRequest request;
 
 		if (method.equalsIgnoreCase(HttpGet.METHOD_NAME)) {
-			request = new HttpGet(Constants.API_BASE_URL + urlPath + urlParams);
+			request = new HttpGet(url + urlParams);
 		} else if (method.equalsIgnoreCase(HttpPut.METHOD_NAME)) {
-			request = new HttpPut(Constants.API_BASE_URL + urlPath + urlParams);
+			request = new HttpPut(url + urlParams);
 		} else if (method.equalsIgnoreCase(HttpDelete.METHOD_NAME)) {
-			request = new HttpDelete(Constants.API_BASE_URL + urlPath
-					+ urlParams);
+			request = new HttpDelete(url + urlParams);
 		} else if (method.equalsIgnoreCase(HttpPost.METHOD_NAME)) {
-			request = new HttpPost(Constants.API_BASE_URL + urlPath + urlParams);
+			request = new HttpPost(url + urlParams);
 		} else {
 			throw new Error("Invalid request method");
 		}
-		
+
 		if (requestJSONBody != null && !method.equals(HttpGet.METHOD_NAME)) {
 			try {
 				request.setHeader("Content-Type", "application/json");

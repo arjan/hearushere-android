@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.hearushere.app.data.Track;
-import roboguice.util.temp.Ln;
+import nl.hearushere.app.data.Walk;
 import android.app.Application;
-import android.util.Log;
 
 import com.octo.android.robospice.SpiceService;
 import com.octo.android.robospice.persistence.CacheManager;
@@ -22,8 +21,11 @@ public class HttpSpiceService extends SpiceService {
 
 		List<Class<?>> cacheableClasses = new ArrayList<Class<?>>();
 		cacheableClasses.add(Track.List.class);
+		cacheableClasses.add(Track.class);
+		cacheableClasses.add(Walk.List.class);
+		cacheableClasses.add(Walk.class);
 
-		Ln.getConfig().setLoggingLevel(Log.WARN);
+//		Ln.getConfig().setLoggingLevel(Log.WARN);
 
 		// // init
 		Jackson2ObjectPersisterFactory jacksonObjectPersisterFactory = new Jackson2ObjectPersisterFactory(

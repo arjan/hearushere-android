@@ -2,6 +2,8 @@ package nl.hearushere.app.net;
 
 import nl.hearushere.app.Constants;
 import nl.hearushere.app.data.Track;
+import nl.hearushere.app.data.Walk;
+import nl.hearushere.app.data.Walk.List;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,8 +24,20 @@ public class API {
 		mMapper = new ObjectMapper();
 		mMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
+	
+	public void getWalks(RequestListener<Walk.List> listener) {
+		mSpiceManager.execute(new SpiceRequest<Walk.List>(
+				Walk.List.class) {
+					@Override
+					public List loadDataFromNetwork() throws Exception {
+						JsonNode node = HttpRequest.doRequest("GET",
+								Constants.HEARUSHERE_BASE_URL + "walks.json", null);
+						return mMapper.treeToValue(node, Walk.List.class);
+					}
+		}, "walks", DurationInMillis.ONE_WEEK, listener);
+	}
 
-	public void getUserTracks(final String userId,
+	public void getSoundCloudUserTracks(final String userId,
 			RequestListener<Track.List> requestListener) {
 		mSpiceManager.execute(new SpiceRequest<Track.List>(
 				Track.List.class) {
@@ -31,11 +45,12 @@ public class API {
 			@Override
 			public Track.List loadDataFromNetwork() throws Exception {
 				JsonNode node = HttpRequest.doRequest("GET",
-						"users/" + userId + "/tracks.json?offset=0&limit=250&client_id=" + Constants.SOUNDCLOUD_CLIENT_ID, null);
+						Constants.SOUNDCLOUD_API_BASE_URL + "users/" + userId + "/tracks.json?offset=0&limit=250&client_id=" + Constants.SOUNDCLOUD_CLIENT_ID, null);
 				return mMapper.treeToValue(node, Track.List.class);
 			}
 
-		}, "tracks", DurationInMillis.ONE_WEEK, requestListener);
+		}, "tracks-" + userId, DurationInMillis.ONE_WEEK, requestListener);
 	}
+	
 
 }

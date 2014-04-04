@@ -2,29 +2,30 @@ package nl.hearushere.app;
 
 import java.util.ArrayList;
 
-import nl.hearushere.app.AudioService.AudioEventListener;
-import nl.hearushere.app.AudioService.LocalBinder;
-import nl.hearushere.app.data.Track;
+import nl.hearushere.app.AudioWalkService.AudioEventListener;
+import nl.hearushere.app.AudioWalkService.LocalBinder;
+import nl.hearushere.app.data.Walk;
+import nl.hearushere.app.data.Walk.List;
 import nl.hearushere.app.net.API;
 import nl.hearushere.app.net.HttpSpiceService;
-import android.R.layout;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,10 +38,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.LatLngBounds.Builder;
-import com.google.android.gms.maps.model.LatLngBoundsCreator;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -50,7 +49,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		OnMapClickListener {
 	protected SpiceManager mSpiceManager = new SpiceManager(
 			HttpSpiceService.class);
-	public static final String TAG = AudioService.class.getSimpleName();
+	public static final String TAG = AudioWalkService.class.getSimpleName();
 
 	private ServiceConnection mServiceConnection;
 	protected LocalBinder mServiceInterface;
@@ -59,12 +58,12 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 	private GoogleMap mMap;
 
-	private Polygon mPolygon;
-
-	private LatLng mCenter;
 	private API mAPI;
 	private View mProgress;
 	private Marker mDebugMarker;
+	private Walk.List mWalks;
+	private Button mButton;
+	private ViewPager mViewPager;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -77,62 +76,122 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		Constants.SOUNDCLOUD_CLIENT_ID = getResources().getString(
 				R.string.area_soundcloud_client_id);
-		Constants.SOUNDCLOUD_USER_ID = getResources().getString(
-				R.string.area_soundcloud_user_id);
 
 		mAPI = new API(mSpiceManager);
-	}
 
-	private void initMap() {
+		showLoader(true);
+		mAPI.getWalks(new RequestListener<Walk.List>() {
 
-		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-				.getMap();
-		mMap.setMyLocationEnabled(true);
-
-		if (Constants.USE_DEBUG_LOCATION) {
-			mMap.setOnMapClickListener(this);
-		}
-
-		Builder builder = new LatLngBounds.Builder();
-
-		// build the polygon
-		String[] source = getResources().getStringArray(R.array.audio_area);
-		ArrayList<LatLng> points = new ArrayList<LatLng>();
-		for (String line : source) {
-			String[] m = line.split(" ");
-			assert (m.length == 2);
-			double lat = Double.parseDouble(m[0]);
-			double lng = Double.parseDouble(m[1]);
-			LatLng point = new LatLng(lat, lng);
-			builder.include(point);
-			points.add(point);
-		}
-		final LatLngBounds bounds = builder.build();
-
-		mPolygon = mMap.addPolygon(new PolygonOptions().addAll(points)
-				.strokeColor(getResources().getColor(R.color.polygon_stroke))
-				.strokeWidth(3f)
-				.fillColor(getResources().getColor(R.color.polygon_fill)));
-
-		final ViewTreeObserver vto = findViewById(android.R.id.content)
-				.getViewTreeObserver();
-		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			@SuppressWarnings("deprecation")
 			@Override
-			public void onGlobalLayout() {
-				//vto.removeGlobalOnLayoutListener(this);
-				mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
+			public void onRequestFailure(SpiceException arg0) {
+				showLoader(false);
+				showNetworkErrorMessage();
+			}
+
+			@Override
+			public void onRequestSuccess(List arg0) {
+				showLoader(false);
+				mWalks = arg0;
+				System.out.println("woot");
+				initPager();
 			}
 		});
 
 	}
 
 	@Override
+	public void showLoader(boolean b) {
+		mProgress.setVisibility(b ? View.VISIBLE : View.GONE);
+	}
+
+	private void initMap(final Walk walk) {
+
+		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
+				.getMap();
+		mMap.setMyLocationEnabled(true);
+		mMap.clear();
+
+		if (Constants.USE_DEBUG_LOCATION) {
+			mMap.setOnMapClickListener(this);
+		}
+
+		mMap.setOnMapLoadedCallback(new OnMapLoadedCallback() {
+			@Override
+			public void onMapLoaded() {
+
+				Builder builder = new LatLngBounds.Builder();
+
+				ArrayList<LatLng> points = walk.getPoints();
+				for (LatLng point : points) {
+					builder.include(point);
+				}
+				final LatLngBounds bounds = builder.build();
+
+				mMap.addPolygon(new PolygonOptions()
+						.addAll(points)
+						.strokeColor(
+								getResources().getColor(R.color.polygon_stroke))
+						.strokeWidth(3f)
+						.fillColor(
+								getResources().getColor(R.color.polygon_fill)));
+
+				mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
+			}
+		});
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
-		initMap();
-		startAudioService();
+		connectAudioService();
 		checkServicesConnected();
+	}
+
+	protected void initPager() {
+		mViewPager = (ViewPager) findViewById(R.id.vp_walks);
+		mViewPager.setAdapter(new WalksPagerAdapter());
+		mButton = (Button)findViewById(R.id.button_start_stop);
+		
+		walkSelected(0);
+		
+		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+			@Override
+			public void onPageSelected(int arg0) {
+				walkSelected(arg0);
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+			}
+		});
+	}
+
+	protected void walkSelected(int arg0) {
+		Walk walk = mWalks.get(arg0);
+		initMap(walk);
+		
+		Walk current = mServiceInterface.getCurrentWalk();
+		if (current == null || !walk.getTitle().equals(current.getTitle())) {
+			mButton.setText("START");
+		} else {
+			mButton.setText("STOP");
+		}
+	}
+	
+	public void clickStartStop(View v) {
+		Walk walk = mWalks.get(mViewPager.getCurrentItem());
+		Walk current = mServiceInterface.getCurrentWalk();
+		if (current == null || !walk.getTitle().equals(current.getTitle())) {
+			mServiceInterface.startPlayback(walk);
+		} else {
+			mServiceInterface.stopPlayback();
+		}
+		walkSelected(mViewPager.getCurrentItem());
 	}
 
 	@Override
@@ -147,17 +206,16 @@ public class MainActivity extends Activity implements AudioEventListener,
 		super.onStop();
 	}
 
-	private void startAudioService() {
-		Intent service = new Intent(this, AudioService.class);
+	private void connectAudioService() {
+		Intent service = new Intent(this, AudioWalkService.class);
 		startService(service);
 
 		mServiceConnection = new ServiceConnection() {
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				mServiceInterface = (AudioService.LocalBinder) service;
+				mServiceInterface = (AudioWalkService.LocalBinder) service;
 				Log.v(TAG, "Bound to service!");
 				mServiceInterface.setAudioEventListener(MainActivity.this);
-				loadTrackList();
 			}
 
 			@Override
@@ -192,50 +250,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 		mTvNotification.setVisibility(View.GONE);
 	}
 
-	private void loadTrackList() {
-		if (mServiceInterface.hasTracks()) {
-			return;
-		}
-
-		mProgress.setVisibility(View.VISIBLE);
-		mAPI.getUserTracks(Constants.SOUNDCLOUD_USER_ID,
-				new RequestListener<Track.List>() {
-					@Override
-					public void onRequestSuccess(Track.List arg0) {
-						mProgress.setVisibility(View.GONE);
-
-						if (Constants.USE_DEBUG_LOCATION) {
-							for (Track track : arg0) {
-								mMap.addMarker(new MarkerOptions()
-										.position(track.getLocation())
-										.alpha(0.5f).title(track.getTitle()));
-							}
-						}
-
-						mServiceInterface.loadTrackList(arg0);
-					}
-
-					@Override
-					public void onRequestFailure(SpiceException arg0) {
-						mProgress.setVisibility(View.GONE);
-						new AlertDialog.Builder(MainActivity.this)
-								.setCancelable(false)
-								.setMessage(
-										"No network connection, please try again when connected.")
-								.setPositiveButton("Close",
-										new OnClickListener() {
-											@Override
-											public void onClick(
-													DialogInterface dialog,
-													int which) {
-												dialog.dismiss();
-												finish();
-											}
-										}).show();
-					}
-				});
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -246,10 +260,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_start_stop:
-			mServiceInterface.stopService();
-			finish();
-			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -261,7 +271,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		// If Google Play services is available
 		if (ConnectionResult.SUCCESS == resultCode) {
 			// In debug mode, log the status
-			//Log.d("Location Updates", "Google Play services is available.");
+			// Log.d("Location Updates", "Google Play services is available.");
 			// Continue
 			return;
 			// Google Play services was not available for some reason
@@ -288,5 +298,71 @@ public class MainActivity extends Activity implements AudioEventListener,
 		mDebugMarker = mMap.addMarker(new MarkerOptions().position(arg0)
 				.draggable(true));
 		mServiceInterface.setDebugLocation(arg0);
+	}
+
+	@Override
+	public void showNetworkErrorMessage() {
+		mProgress.setVisibility(View.GONE);
+		new AlertDialog.Builder(MainActivity.this)
+				.setCancelable(false)
+				.setMessage(
+						"No network connection, please try again when connected.")
+				.setPositiveButton("Close", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						finish();
+					}
+				}).show();
+	}
+
+	class WalksPagerAdapter extends PagerAdapter {
+
+		@Override
+		public int getCount() {
+			return mWalks.size();
+		}
+
+		public Walk getItem(int currentItem) {
+			return mWalks.get(currentItem);
+		}
+
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+
+			View root = View.inflate(MainActivity.this,
+					R.layout.view_item_walk, null);
+
+			final Walk walk = mWalks.get(position);
+			((TextView) root.findViewById(R.id.tv_item_title)).setText(walk
+					.getTitle());
+			Log.v(TAG, walk.getTitle());
+
+			root.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+
+				}
+			});
+
+			container.addView(root);
+			return root;
+		}
+
+		@Override
+		public boolean isViewFromObject(View arg0, Object arg1) {
+			return arg0 == ((View) arg1);
+		}
+
+		@Override
+		public int getItemPosition(Object object) {
+			return POSITION_NONE;
+		}
+
+		@Override
+		public void destroyItem(View arg0, int arg1, Object arg2) {
+			((ViewPager) arg0).removeView((View) arg2);
+		}
+
 	}
 }

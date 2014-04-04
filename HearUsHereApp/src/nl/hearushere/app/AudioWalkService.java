@@ -4,11 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import nl.hearushere.app.data.Track;
+import nl.hearushere.app.data.Walk;
+import nl.hearushere.app.net.API;
+import nl.hearushere.app.net.HttpSpiceService;
 
 import org.apache.commons.io.FileUtils;
 
@@ -24,6 +28,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -33,21 +39,26 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
+import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 
-public class AudioService extends Service implements
+public class AudioWalkService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
 
 	public interface AudioEventListener {
-		// here
-
 		public void showNotification(String message);
 
 		public void hideNotification();
 
+		public void showNetworkErrorMessage();
+
+		public void showLoader(boolean flag);
+
 	}
 
-	public static final String TAG = AudioService.class.getSimpleName();
+	public static final String TAG = AudioWalkService.class.getSimpleName();
 
 	private static int INTENT_ONGOING_ID = 1001;
 	private static int INTENT_ACTIVITY_ID = 1002;
@@ -62,7 +73,16 @@ public class AudioService extends Service implements
 
 	private boolean mStarted;
 
+	private Walk mCurrentWalk;
+
 	private LocationClient mLocationClient;
+
+	private LocationRequest mLocationRequest;
+
+	private VolumeManager mVolumeHandler;
+
+	public int mTotalDuration = -1;
+	private long mSoundStartTime;
 
 	public class LocalBinder extends Binder {
 		public void setAudioEventListener(AudioEventListener listener) {
@@ -84,13 +104,72 @@ public class AudioService extends Service implements
 			stopSelf();
 		}
 
-		public boolean hasTracks() {
-			return mTrackList != null;
+		public void startPlayback(Walk walk) {
+			if (mCurrentWalk != null) {
+				stopPlayback();
+			}
+			mCurrentWalk = walk;
+			mTrackList = null;
+
+			System.out.println("STARTPLA");
+			if (mAudioEventListener != null) {
+				mAudioEventListener.showLoader(true);
+			}
+
+			mAPI.getSoundCloudUserTracks(walk.getScUser(),
+					new RequestListener<Track.List>() {
+						@Override
+						public void onRequestSuccess(Track.List list) {
+							if (mAudioEventListener != null) {
+								mAudioEventListener.showLoader(false);
+							}
+
+							// if (Constants.USE_DEBUG_LOCATION) {
+							// for (Track track : arg0) {
+							// mMap.addMarker(new MarkerOptions()
+							// .position(track.getLocation())
+							// .alpha(0.5f).title(track.getTitle()));
+							// }
+							// }
+							mTrackList = list;
+							loadTracks();
+						}
+
+						@Override
+						public void onRequestFailure(SpiceException arg0) {
+							if (mAudioEventListener != null) {
+								mAudioEventListener.showNetworkErrorMessage();
+							}
+						}
+					});
+
+		}
+
+		public Walk getCurrentWalk() {
+			return mCurrentWalk;
 		}
 
 		public void loadTrackList(Track.List list) {
-			mTrackList = list;
-			loadTracks();
+			stopPlayback();
+		}
+
+		public void stopPlayback() {
+			mAudioEventListener.showLoader(false);
+			hideNotification();
+			
+			if (mTrackList != null) {
+				for (Track track : mTrackList) {
+					MediaPlayer mp = track.getMediaPlayer();
+					if (mp != null) {
+						mp.stop();
+						mp.reset();
+						mp.release();
+					}
+				}
+			}
+			mCurrentWalk = null;
+			mSoundsLoaded = false;
+			mTrackList = null;
 		}
 
 		public void setDebugLocation(final LatLng location) {
@@ -103,6 +182,11 @@ public class AudioService extends Service implements
 		}
 	}
 
+	protected SpiceManager mSpiceManager = new SpiceManager(
+			HttpSpiceService.class);
+
+	private API mAPI;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -112,8 +196,12 @@ public class AudioService extends Service implements
 		mHandlerThread = new HandlerThread("Audio Background Handler");
 		mHandlerThread.start();
 		mHandler = new Handler(mHandlerThread.getLooper());
+		mVolumeHandler = new VolumeManager(mHandlerThread.getLooper());
 
 		mLocationClient = new LocationClient(this, this, this);
+
+		mAPI = new API(mSpiceManager);
+		mSpiceManager.start(this);
 	}
 
 	public void loadTracks() {
@@ -122,11 +210,11 @@ public class AudioService extends Service implements
 			@Override
 			public void run() {
 				Log.v(TAG, "Loading next track");
-				for (int i = 0; i < mTrackList.size(); i++) {
+				for (int i = 0; mTrackList != null && i < mTrackList.size(); i++) {
 					Track track = mTrackList.get(i);
 
 					final File cacheFile = track
-							.getCacheFile(AudioService.this);
+							.getCacheFile(AudioWalkService.this);
 
 					String url = track.getStreamUrl() + "?client_id="
 							+ getString(R.string.area_soundcloud_client_id);
@@ -146,6 +234,7 @@ public class AudioService extends Service implements
 					}
 				}
 				hideNotification();
+				mSoundStartTime = -1;
 				mSoundsLoaded = true;
 			}
 		});
@@ -166,37 +255,14 @@ public class AudioService extends Service implements
 			// if we are in range, we should play this track
 			if (shouldPlay) {
 
-				if (mp != null) {
-					assert (mp.isPlaying());
-					float volume = track.getVolume();
-					Log.v(TAG, "... still playing " + track.getTitle() + " "
-							+ volume);
-					mp.setVolume(volume, volume);
-				} else {
-					float volume = track.getVolume();
-					Log.v(TAG, "start " + track.getTitle() + " " + volume);
-					mp = new MediaPlayer();
-					mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-					try {
-						mp.setDataSource(track.getCacheFile(AudioService.this)
-								.getAbsolutePath());
-						mp.prepare();
-					} catch (Exception e) {
-						e.printStackTrace();
-						continue;
-					}
-					mp.setVolume(volume, volume);
-					mp.setLooping(true);
-					mp.start();
-					track.setMediaPlayer(mp);
-				}
+				float volume = track.getCalculatedVolume();
+				mVolumeHandler.fadeToVolume(track, volume, Constants.FADE_TIME);
+
 				soundsPlaying++;
 			} else {
 				if (mp != null) {
 					Log.v(TAG, "stop " + track.getTitle());
-					mp.stop();
-					mp.release();
-					track.setMediaPlayer(null);
+					mVolumeHandler.fadeToVolume(track, 0f, Constants.FADE_TIME);
 				}
 			}
 		}
@@ -326,12 +392,12 @@ public class AudioService extends Service implements
 	public void onConnected(Bundle arg0) {
 		Log.v(TAG, "Location services connected");
 
-		LocationRequest locationRequest = LocationRequest.create();
+		mLocationRequest = LocationRequest.create();
 		// Use high accuracy
-		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-		locationRequest.setInterval(30 * 1000);
-		locationRequest.setFastestInterval(5 * 1000);
-		mLocationClient.requestLocationUpdates(locationRequest, this);
+		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+		mLocationRequest.setInterval(30 * 1000);
+		mLocationRequest.setFastestInterval(5 * 1000);
+		mLocationClient.requestLocationUpdates(mLocationRequest, this);
 
 		onLocationChanged(mLocationClient.getLastLocation());
 	}
@@ -340,6 +406,91 @@ public class AudioService extends Service implements
 	public void onDisconnected() {
 		Log.v(TAG, "Location services disconnected!!");
 		showNotification("Location disconnected");
+
+		if (mLocationRequest != null) {
+			mLocationClient.requestLocationUpdates(mLocationRequest, this);
+		}
 	}
 
+	private class VolumeManager extends Handler {
+		public VolumeManager(Looper looper) {
+			super(looper);
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			// super.handleMessage(msg);
+
+			Track track = (Track) msg.obj;
+			float v = msg.arg1 / 1000.0f;
+
+			MediaPlayer mp = track.getMediaPlayer();
+			if (mp == null) {
+				mp = buildMediaPlayer(track);
+				track.setMediaPlayer(mp);
+				Log.v(TAG, "Start track: " + track.getTitle());
+			}
+			try {
+				track.getMediaPlayer().setVolume(v, v);
+			} catch (IllegalStateException e) {
+			}
+			track.setCurrentVolume(v);
+
+			if (v < 0.000001f) {
+				mp = track.getMediaPlayer();
+				mp.stop();
+				mp.reset();
+				mp.release();
+				track.setMediaPlayer(null);
+				Log.v(TAG, "Stop track: " + track.getTitle());
+			}
+		}
+
+		private MediaPlayer buildMediaPlayer(Track track) {
+			MediaPlayer mp = new MediaPlayer();
+			mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			try {
+				mp.setDataSource(track.getCacheFile(AudioWalkService.this)
+						.getAbsolutePath());
+				mp.prepare();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			mp.setVolume(0f, 0f);
+			mp.setLooping(true);
+
+			if (mTotalDuration == -1) {
+				mTotalDuration = mp.getDuration();
+			}
+			if (mSoundStartTime == -1) {
+				mSoundStartTime = Calendar.getInstance().getTimeInMillis();
+			}
+
+			if (Constants.TRACKS_ARE_SYNCHRONIZED) {
+				mp.seekTo((int) ((Calendar.getInstance().getTimeInMillis() - mSoundStartTime) % mTotalDuration));
+			}
+
+			mp.start();
+
+			return mp;
+		}
+
+		public void fadeToVolume(Track track, float v, int time) {
+			removeMessages(track.getId());
+
+			float current = track.getCurrentVolume();
+			float delta = (v - current) / (time / Constants.FADE_STEP);
+			for (int t = 0; t < time; t += Constants.FADE_STEP) {
+				current += delta;
+				Message m = obtainMessage(track.getId(),
+						(int) (current * 1000), 0);
+				m.obj = track;
+				sendMessageDelayed(m, t);
+			}
+			Message m = obtainMessage(track.getId(), (int) (v * 1000), 0);
+			m.obj = track;
+			sendMessageDelayed(m, time);
+		}
+	}
 }

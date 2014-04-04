@@ -2,10 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_start_stop"
-        android:showAsAction="always"
-        android:title="@string/btn_stop"/>
-    <item
         android:id="@+id/menu_info"
         android:showAsAction="never"
         android:title="@string/btn_about"/>

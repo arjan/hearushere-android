@@ -24,6 +24,9 @@ public class Track {
 	}
 
 	@JsonProperty
+	private int id;
+	
+	@JsonProperty
 	private String title;
 
 	@JsonProperty("tag_list")
@@ -38,6 +41,9 @@ public class Track {
 	@JsonIgnore
 	private MediaPlayer mediaPlayer;
 
+	@JsonIgnore
+	private float currentVolume;
+	
 	@JsonIgnore
 	private double currentDistance;
 
@@ -91,7 +97,7 @@ public class Track {
 		this.currentDistance = currentDistance;
 	}
 
-	public float getVolume() {
+	public float getCalculatedVolume() {
 		if (currentDistance > Constants.MAX_SOUND_DISTANCE) {
 			return 0f;
 		}
@@ -105,5 +111,24 @@ public class Track {
 
 	public void setMediaPlayer(MediaPlayer mediaPlayer) {
 		this.mediaPlayer = mediaPlayer;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public float getCurrentVolume() {
+		return currentVolume;
+	}
+
+	public void setCurrentVolume(float currentVolume) {
+		this.currentVolume = currentVolume;
+		if (mediaPlayer != null) {
+			mediaPlayer.setVolume(currentVolume, currentVolume);
+		}
 	}
 }
