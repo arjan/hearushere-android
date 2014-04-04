@@ -2,7 +2,7 @@ package nl.hearushere.app;
 
 public class Constants {
 
-	public static final boolean USE_DEBUG_LOCATION = true;
+	public static final boolean USE_DEBUG_LOCATION = false;
 	
 	public static boolean TRACKS_ARE_SYNCHRONIZED = true; // whether the tracks start at the same seek time
 	

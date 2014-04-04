@@ -243,6 +243,10 @@ public class AudioWalkService extends Service implements
 	}
 
 	private void playLocationSounds(LatLng location) {
+		if (mTrackList == null) {
+			return;
+		}
+		
 		Log.v(TAG, "LOCATION UPDATE " + location.toString());
 		List<Track> sorted = getDistanceSortedTracks(location);
 
@@ -370,7 +374,7 @@ public class AudioWalkService extends Service implements
 
 	@Override
 	public void onLocationChanged(final Location location) {
-		if (!mSoundsLoaded || Constants.USE_DEBUG_LOCATION) {
+		if (!mSoundsLoaded || mTrackList == null || Constants.USE_DEBUG_LOCATION) {
 			return;
 		}
 
