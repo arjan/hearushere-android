@@ -41,6 +41,9 @@ public class Walk {
 	@JsonProperty
 	private String description;
 	
+	@JsonProperty
+	private boolean tracksSynchronized;
+	
 	public static Walk create(Context context, String title, String scUser, int areaRes) {
 		Walk walk = new Walk();
 		walk.title = title;
@@ -110,5 +113,13 @@ public class Walk {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public boolean areTracksSynchronized() {
+		return tracksSynchronized;
+	}
+
+	public void setTracksSynchronized(boolean tracksSynchronized) {
+		this.tracksSynchronized = tracksSynchronized;
 	}
 }

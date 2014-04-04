@@ -5,4 +5,7 @@
     <string name="btn_stop">Stop</string>
     <string name="btn_about">About this app</string>
     <string name="load_progress">Loading track %1$d of %2$d…</string>
+    
+    <string name="area_soundcloud_client_id">67d151c73268e6f9248a4238404a4e91</string>
+    
 </resources>

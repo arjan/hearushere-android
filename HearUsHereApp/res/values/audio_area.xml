@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="audio_area">
-        <item>52.375141 4.843426</item>
-        <item>52.375010 4.845722</item>
-        <item>52.375324 4.847460</item>
-        <item>52.375953 4.850485</item>
-        <item>52.376254 4.852309</item>
-        <item>52.376346 4.854240</item>
-        <item>52.374486 4.854906</item>
-        <item>52.373569 4.852352</item>
-        <item>52.372992 4.849799</item>
-        <item>52.372468 4.846816</item>
-        <item>52.372521 4.842825</item>
-        <item>52.373962 4.842932</item>
-        <item>52.375141 4.843426</item>
+    <bool name="static_tracks_synchronized">true</bool>
+
+    <string name="static_soundcloud_user">artpark-1</string>
+    
+    <string-array name="static_audio_area">
+        <item>52.357700 4.864917</item>
+        <item>52.358212 4.863082</item>
+        <item>52.357962 4.862213</item>
+        <item>52.357097 4.864359</item>
+        <item>52.356704 4.863243</item>
+        <item>52.356743 4.862621</item>
+        <item>52.356468 4.862213</item>
+        <item>52.356023 4.861977</item>
+        <item>52.355826 4.861333</item>
+        <item>52.355865 4.860260</item>
+        <item>52.356455 4.859273</item>
+        <item>52.357189 4.861183</item>
+        <item>52.357608 4.860904</item>
+        <item>52.357949 4.862235</item>
     </string-array>
 
 </resources>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="area_soundcloud_user_id">66520468</string>
-    
-    <!--  see https://soundcloud.com/you/apps/hear-us-here-josephs-ghost-android/edit -->
-    <string name="area_soundcloud_client_id">67d151c73268e6f9248a4238404a4e91</string>
-    
-</resources>

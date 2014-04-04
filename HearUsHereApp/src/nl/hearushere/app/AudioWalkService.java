@@ -93,6 +93,7 @@ public class AudioWalkService extends Service implements
 			mLocationClient.disconnect();
 			if (mTrackList != null) {
 				for (Track track : mTrackList) {
+					mVolumeHandler.removeMessages(track.getId());
 					MediaPlayer mp = track.getMediaPlayer();
 					if (mp != null) {
 						mp.stop();
@@ -159,6 +160,7 @@ public class AudioWalkService extends Service implements
 			
 			if (mTrackList != null) {
 				for (Track track : mTrackList) {
+					mVolumeHandler.removeMessages(track.getId());
 					MediaPlayer mp = track.getMediaPlayer();
 					if (mp != null) {
 						mp.stop();
@@ -429,10 +431,6 @@ public class AudioWalkService extends Service implements
 				mp = buildMediaPlayer(track);
 				track.setMediaPlayer(mp);
 				Log.v(TAG, "Start track: " + track.getTitle());
-			}
-			try {
-				track.getMediaPlayer().setVolume(v, v);
-			} catch (IllegalStateException e) {
 			}
 			track.setCurrentVolume(v);
 

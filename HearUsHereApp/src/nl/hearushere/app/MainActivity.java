@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import nl.hearushere.app.AudioWalkService.AudioEventListener;
 import nl.hearushere.app.AudioWalkService.LocalBinder;
 import nl.hearushere.app.data.Walk;
-import nl.hearushere.app.data.Walk.List;
 import nl.hearushere.app.net.API;
 import nl.hearushere.app.net.HttpSpiceService;
 import android.app.Activity;
@@ -61,7 +60,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 	private API mAPI;
 	private View mProgress;
 	private Marker mDebugMarker;
-	private Walk.List mWalks;
+	private ArrayList<Walk> mWalks;
 	private Button mButton;
 	private ViewPager mViewPager;
 
@@ -79,24 +78,36 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		mAPI = new API(mSpiceManager);
 
-		showLoader(true);
-		mAPI.getWalks(new RequestListener<Walk.List>() {
+		if (Constants.USE_HARDCODED_WALK) {
+			mWalks = new ArrayList<Walk>();
+			
+			Walk walk = Walk.create(this, getString(R.string.app_name), 
+					getString(R.string.static_soundcloud_user), 
+					R.array.static_audio_area);
+			walk.setTracksSynchronized(getResources().getBoolean(R.bool.static_tracks_synchronized));
+			
+			mWalks.add(walk);
+			
+		} else {
+			// universal
+			showLoader(true);
+			mAPI.getWalks(new RequestListener<Walk.List>() {
 
-			@Override
-			public void onRequestFailure(SpiceException arg0) {
-				showLoader(false);
-				showNetworkErrorMessage();
-			}
+				@Override
+				public void onRequestFailure(SpiceException arg0) {
+					showLoader(false);
+					showNetworkErrorMessage();
+				}
 
-			@Override
-			public void onRequestSuccess(List arg0) {
-				showLoader(false);
-				mWalks = arg0;
-				System.out.println("woot");
-				initPager();
-			}
-		});
-
+				@Override
+				public void onRequestSuccess(Walk.List arg0) {
+					showLoader(false);
+					mWalks = arg0;
+					System.out.println("woot");
+					initPager();
+				}
+			});
+		}
 	}
 
 	@Override
@@ -148,12 +159,19 @@ public class MainActivity extends Activity implements AudioEventListener,
 	}
 
 	protected void initPager() {
+
 		mViewPager = (ViewPager) findViewById(R.id.vp_walks);
-		mViewPager.setAdapter(new WalksPagerAdapter());
-		mButton = (Button)findViewById(R.id.button_start_stop);
 		
+		if (mWalks.size() == 1) {
+			mViewPager.setVisibility(View.GONE);
+		} else {
+			mViewPager.setAdapter(new WalksPagerAdapter());
+			mViewPager.setVisibility(View.VISIBLE);
+		}
+		mButton = (Button) findViewById(R.id.button_start_stop);
+
 		walkSelected(0);
-		
+
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 
 			@Override
@@ -174,7 +192,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 	protected void walkSelected(int arg0) {
 		Walk walk = mWalks.get(arg0);
 		initMap(walk);
-		
+
 		Walk current = mServiceInterface.getCurrentWalk();
 		if (current == null || !walk.getTitle().equals(current.getTitle())) {
 			mButton.setText("START");
@@ -182,13 +200,15 @@ public class MainActivity extends Activity implements AudioEventListener,
 			mButton.setText("STOP");
 		}
 	}
-	
+
 	public void clickStartStop(View v) {
 		Walk walk = mWalks.get(mViewPager.getCurrentItem());
 		Walk current = mServiceInterface.getCurrentWalk();
 		if (current == null || !walk.getTitle().equals(current.getTitle())) {
+			getActionBar().setTitle(walk.getTitle());
 			mServiceInterface.startPlayback(walk);
 		} else {
+			getActionBar().setTitle(getString(R.string.app_name));
 			mServiceInterface.stopPlayback();
 		}
 		walkSelected(mViewPager.getCurrentItem());
@@ -216,6 +236,10 @@ public class MainActivity extends Activity implements AudioEventListener,
 				mServiceInterface = (AudioWalkService.LocalBinder) service;
 				Log.v(TAG, "Bound to service!");
 				mServiceInterface.setAudioEventListener(MainActivity.this);
+				
+				if (mWalks != null && mViewPager == null) {
+					initPager();
+				}
 			}
 
 			@Override

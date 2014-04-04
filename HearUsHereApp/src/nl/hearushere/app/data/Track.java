@@ -25,7 +25,7 @@ public class Track {
 
 	@JsonProperty
 	private int id;
-	
+
 	@JsonProperty
 	private String title;
 
@@ -43,7 +43,7 @@ public class Track {
 
 	@JsonIgnore
 	private float currentVolume;
-	
+
 	@JsonIgnore
 	private double currentDistance;
 
@@ -102,7 +102,13 @@ public class Track {
 			return 0f;
 		}
 		// Magic (c) James Bryan Graves :)
-		return (float) Math.max(0.0, Math.min(1.0, Math.log(currentDistance / Constants.MAX_SOUND_DISTANCE) * -0.5));
+		return (float) Math
+				.max(0.0,
+						Math.min(
+								1.0,
+								Math.log(currentDistance
+										/ Constants.MAX_SOUND_DISTANCE)
+										* -0.5));
 	}
 
 	public MediaPlayer getMediaPlayer() {
@@ -128,7 +134,10 @@ public class Track {
 	public void setCurrentVolume(float currentVolume) {
 		this.currentVolume = currentVolume;
 		if (mediaPlayer != null) {
-			mediaPlayer.setVolume(currentVolume, currentVolume);
+			try {
+				mediaPlayer.setVolume(currentVolume, currentVolume);
+			} catch (IllegalStateException e) {
+			}
 		}
 	}
 }
