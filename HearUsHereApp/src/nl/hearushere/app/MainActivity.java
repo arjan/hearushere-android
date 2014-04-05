@@ -302,20 +302,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 		mTvNotification.animate().alpha(0f).setDuration(500).start();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		getMenuInflater().inflate(R.menu.menu_main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
 	private void checkServicesConnected() {
 		// Check that Google Play services is available
 		int resultCode = GooglePlayServicesUtil
