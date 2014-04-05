@@ -17,10 +17,14 @@ import nl.hearushere.app.net.HttpSpiceService;
 import org.apache.commons.io.FileUtils;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
@@ -33,19 +37,12 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
-public class AudioWalkService extends Service implements
-		GooglePlayServicesClient.ConnectionCallbacks,
-		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
+public class AudioWalkService extends Service implements LocationListener {
 
 	public interface AudioEventListener {
 		public void showNotification(String message);
@@ -62,6 +59,7 @@ public class AudioWalkService extends Service implements
 
 	private static int INTENT_ONGOING_ID = 1001;
 	private static int INTENT_ACTIVITY_ID = 1002;
+	private static final int LOCATION_TIME_DELTA = 1000 * 60 * 2;
 
 	public AudioEventListener mAudioEventListener;
 	private LocalBinder mBinder = new LocalBinder();
@@ -75,10 +73,6 @@ public class AudioWalkService extends Service implements
 
 	private Walk mCurrentWalk;
 
-	private LocationClient mLocationClient;
-
-	private LocationRequest mLocationRequest;
-
 	private VolumeManager mVolumeHandler;
 
 	public int mTotalDuration = -1;
@@ -90,7 +84,7 @@ public class AudioWalkService extends Service implements
 		}
 
 		public void stopService() {
-			mLocationClient.disconnect();
+
 			if (mTrackList != null) {
 				for (Track track : mTrackList) {
 					mVolumeHandler.removeMessages(track.getId());
@@ -106,13 +100,18 @@ public class AudioWalkService extends Service implements
 		}
 
 		public void startPlayback(Walk walk) {
+
+			// Register the listener with the Location Manager to receive location updates
+			mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, AudioWalkService.this);
+
 			if (mCurrentWalk != null) {
 				stopPlayback();
 			}
 			mCurrentWalk = walk;
 			mTrackList = null;
+			
+			updateServiceNotification();
 
-			System.out.println("STARTPLA");
 			if (mAudioEventListener != null) {
 				mAudioEventListener.showLoader(true);
 			}
@@ -150,13 +149,10 @@ public class AudioWalkService extends Service implements
 			return mCurrentWalk;
 		}
 
-		public void loadTrackList(Track.List list) {
-			stopPlayback();
-		}
-
 		public void stopPlayback() {
 			mAudioEventListener.showLoader(false);
 			hideNotification();
+			mLocationManager.removeUpdates(AudioWalkService.this);
 			
 			if (mTrackList != null) {
 				for (Track track : mTrackList) {
@@ -170,6 +166,8 @@ public class AudioWalkService extends Service implements
 				}
 			}
 			mCurrentWalk = null;
+			updateServiceNotification();
+
 			mSoundsLoaded = false;
 			mTrackList = null;
 		}
@@ -189,6 +187,10 @@ public class AudioWalkService extends Service implements
 
 	private API mAPI;
 
+	private LocationManager mLocationManager;
+
+	private Location mLastLocation;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -200,8 +202,8 @@ public class AudioWalkService extends Service implements
 		mHandler = new Handler(mHandlerThread.getLooper());
 		mVolumeHandler = new VolumeManager(mHandlerThread.getLooper());
 
-		mLocationClient = new LocationClient(this, this, this);
-
+		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		
 		mAPI = new API(mSpiceManager);
 		mSpiceManager.start(this);
 	}
@@ -211,7 +213,6 @@ public class AudioWalkService extends Service implements
 
 			@Override
 			public void run() {
-				Log.v(TAG, "Loading next track");
 				for (int i = 0; mTrackList != null && i < mTrackList.size(); i++) {
 					Track track = mTrackList.get(i);
 
@@ -222,6 +223,7 @@ public class AudioWalkService extends Service implements
 							+ getString(R.string.area_soundcloud_client_id);
 
 					if (!cacheFile.exists()) {
+						Log.v(TAG, "Loading track...");
 						showNotification(String.format(
 								getString(R.string.load_progress), i + 1,
 								mTrackList.size()));
@@ -238,6 +240,7 @@ public class AudioWalkService extends Service implements
 				hideNotification();
 				mSoundStartTime = -1;
 				mSoundsLoaded = true;
+				showNotification("Please go to the area located on the map to begin.");
 			}
 		});
 	}
@@ -253,6 +256,7 @@ public class AudioWalkService extends Service implements
 		// loop through all sounds
 		int soundsPlaying = 0;
 		for (Track track : sorted) {
+			
 			boolean shouldPlay = track.getCurrentDistance() < Constants.MAX_SOUND_DISTANCE
 					&& soundsPlaying < Constants.MAX_SIMULTANEOUS_SOUNDS;
 
@@ -260,7 +264,6 @@ public class AudioWalkService extends Service implements
 
 			// if we are in range, we should play this track
 			if (shouldPlay) {
-
 				float volume = track.getCalculatedVolume();
 				mVolumeHandler.fadeToVolume(track, volume, Constants.FADE_TIME);
 
@@ -312,27 +315,34 @@ public class AudioWalkService extends Service implements
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
 		if (!mStarted) {
-			Intent startIntent = new Intent(this, MainActivity.class);
-			startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-			PendingIntent p = PendingIntent.getActivity(this,
-					INTENT_ACTIVITY_ID, startIntent, 0);
-
-			Notification notification = new NotificationCompat.Builder(this)
-					.setOngoing(true)
-					.setSmallIcon(R.drawable.ic_launcher)
-					.setContentIntent(p)
-					.setContentTitle(getString(R.string.app_name))
-					.setContentText(
-							getString(R.string.notification_progress_text))
-					.build();
+			Notification notification = buildServiceNotification();
 			startForeground(INTENT_ONGOING_ID, notification);
-
-			mLocationClient.connect();
 
 			mStarted = true;
 		}
 
 		return START_STICKY;
+	}
+	
+	private void updateServiceNotification() {
+		((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).notify(INTENT_ONGOING_ID, buildServiceNotification());
+	}
+
+	private Notification buildServiceNotification() {
+		Intent startIntent = new Intent(this, MainActivity.class);
+		startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+		PendingIntent p = PendingIntent.getActivity(this,
+				INTENT_ACTIVITY_ID, startIntent, 0);
+
+		Notification notification = new NotificationCompat.Builder(this)
+				.setOngoing(true)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentIntent(p)
+				.setContentTitle(mCurrentWalk == null ? getString(R.string.app_name) : mCurrentWalk.getTitle())
+				.setContentText(
+						getString(mCurrentWalk == null ? R.string.notification_not_started_text : R.string.notification_progress_text))
+				.build();
+		return notification;
 	}
 
 	@Override
@@ -370,52 +380,6 @@ public class AudioWalkService extends Service implements
 				mAudioEventListener.hideNotification();
 			}
 		});
-	}
-
-	@Override
-	public void onLocationChanged(final Location location) {
-		if (!mSoundsLoaded || mTrackList == null || Constants.USE_DEBUG_LOCATION) {
-			return;
-		}
-
-		Runnable playLocationSounds = new Runnable() {
-			@Override
-			public void run() {
-				playLocationSounds(new LatLng(location.getLatitude(),
-						location.getLongitude()));
-			}
-		};
-		mHandler.removeCallbacks(playLocationSounds);
-		mHandler.postDelayed(playLocationSounds, 200);
-	}
-
-	@Override
-	public void onConnectionFailed(ConnectionResult arg0) {
-		showNotification("Location connection failed");
-	}
-
-	@Override
-	public void onConnected(Bundle arg0) {
-		Log.v(TAG, "Location services connected");
-
-		mLocationRequest = LocationRequest.create();
-		// Use high accuracy
-		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-		mLocationRequest.setInterval(30 * 1000);
-		mLocationRequest.setFastestInterval(5 * 1000);
-		mLocationClient.requestLocationUpdates(mLocationRequest, this);
-
-		onLocationChanged(mLocationClient.getLastLocation());
-	}
-
-	@Override
-	public void onDisconnected() {
-		Log.v(TAG, "Location services disconnected!!");
-		showNotification("Location disconnected");
-
-		if (mLocationRequest != null) {
-			mLocationClient.requestLocationUpdates(mLocationRequest, this);
-		}
 	}
 
 	private class VolumeManager extends Handler {
@@ -495,4 +459,101 @@ public class AudioWalkService extends Service implements
 			sendMessageDelayed(m, time);
 		}
 	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onLocationChanged(final Location location) {
+		if (location == null || !mSoundsLoaded || mTrackList == null || Constants.USE_DEBUG_LOCATION) {
+			return;
+		}
+
+		if (!isBetterLocation(location, mLastLocation)) {
+			return;
+		}
+		mLastLocation = location;
+		
+		Runnable playLocationSounds = new Runnable() {
+			@Override
+			public void run() {
+				playLocationSounds(new LatLng(location.getLatitude(),
+						location.getLongitude()));
+			}
+		};
+		mHandler.removeCallbacks(playLocationSounds);
+		mHandler.postDelayed(playLocationSounds, 200);
+	}
+
+
+	
+	/** Determines whether one Location reading is better than the current Location fix
+	  * @param location  The new Location that you want to evaluate
+	  * @param currentBestLocation  The current Location fix, to which you want to compare the new one
+	  */
+	protected boolean isBetterLocation(Location location, Location currentBestLocation) {
+	    if (currentBestLocation == null) {
+	        // A new location is always better than no location
+	        return true;
+	    }
+
+	    // Check whether the new location fix is newer or older
+	    long timeDelta = location.getTime() - currentBestLocation.getTime();
+	    boolean isSignificantlyNewer = timeDelta > LOCATION_TIME_DELTA;
+	    boolean isSignificantlyOlder = timeDelta < -LOCATION_TIME_DELTA;
+	    boolean isNewer = timeDelta > 0;
+
+	    // If it's been more than two minutes since the current location, use the new location
+	    // because the user has likely moved
+	    if (isSignificantlyNewer) {
+	        return true;
+	    // If the new location is more than two minutes older, it must be worse
+	    } else if (isSignificantlyOlder) {
+	        return false;
+	    }
+
+	    // Check whether the new location fix is more or less accurate
+	    int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+	    boolean isLessAccurate = accuracyDelta > 0;
+	    boolean isMoreAccurate = accuracyDelta < 0;
+	    boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+	    // Check if the old and new location are from the same provider
+	    boolean isFromSameProvider = isSameProvider(location.getProvider(),
+	            currentBestLocation.getProvider());
+
+	    // Determine location quality using a combination of timeliness and accuracy
+	    if (isMoreAccurate) {
+	        return true;
+	    } else if (isNewer && !isLessAccurate) {
+	        return true;
+	    } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+	        return true;
+	    }
+	    return false;
+	}
+
+	/** Checks whether two providers are the same */
+	private boolean isSameProvider(String provider1, String provider2) {
+	    if (provider1 == null) {
+	      return provider2 == null;
+	    }
+	    return provider1.equals(provider2);
+	}
+	
 }

@@ -257,6 +257,9 @@ public class MainActivity extends Activity implements AudioEventListener,
 		if (mServiceConnection != null) {
 			if (mServiceInterface != null) {
 				mServiceInterface.setAudioEventListener(null);
+				if (mServiceInterface.getCurrentWalk() == null) {
+					mServiceInterface.stopService();
+				}
 			}
 			unbindService(mServiceConnection);
 		}
