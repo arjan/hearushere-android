@@ -19,7 +19,20 @@
     <target name="app-refactor" >
 
         <copy file="./configs/${project}.xml" tofile="./res/values/app_config.xml" overwrite="true" />
+
+        <exec executable="/usr/bin/convert">
+            <arg value="configs/${project}_1024.png" />
+            <arg value="-resize" /><arg value="48" />
+            <arg value="res/drawable-mdpi/ic_launcher.png" />
+        </exec>
+
+        <exec executable="/usr/bin/convert">
+            <arg value="configs/${project}_1024.png" />
+            <arg value="-resize" /><arg value="96" />
+            <arg value="res/drawable-xhdpi/ic_launcher.png" />
+        </exec>
         
+
         <!--1st. Change the import package.R in all java classes -->
         <replaceregexp
             byline="false"
