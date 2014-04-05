@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg" >
 
-    <TextView
-        android:id="@+id/tv_item_title"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/notification_bg"
-        android:gravity="center"
-        android:padding="18dp"
-        android:textStyle="bold"
-        android:textColor="@color/notification_fg" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal" >
+
+        <nl.hearushere.app.ui.CircleImageView
+            android:id="@+id/iv_item_logo"
+            android:src="#333333"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/tv_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="asdf"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/main_fg"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_item_distance"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
         android:layout_margin="10dp"
-        android:background="@color/notification_bg"
-        android:gravity="bottom|right"
-        android:textColor="@color/notification_fg" />
+        android:textColor="@color/main_fg" />
 
 </FrameLayout>

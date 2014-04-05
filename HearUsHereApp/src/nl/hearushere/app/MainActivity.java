@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -42,9 +43,13 @@ import com.google.android.gms.maps.model.LatLngBounds.Builder;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
+import com.viewpagerindicator.CirclePageIndicator;
 
 public class MainActivity extends Activity implements AudioEventListener,
 		OnMapClickListener {
@@ -73,6 +78,8 @@ public class MainActivity extends Activity implements AudioEventListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		ImageLoader.getInstance().init(new ImageLoaderConfiguration.Builder(this).build());
+		
 		mTvNotification = (TextView) findViewById(R.id.tv_notification);
 		mProgress = findViewById(R.id.progress);
 
@@ -120,8 +127,15 @@ public class MainActivity extends Activity implements AudioEventListener,
 		mProgress.setVisibility(b ? View.VISIBLE : View.GONE);
 	}
 
+	private Walk mLastMapWalk = null;
+	
 	private void initMap(final Walk walk) {
 
+		if (mLastMapWalk == walk) {
+			return;
+		}
+		mLastMapWalk = walk;
+		
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
 		mMap.setMyLocationEnabled(true);
@@ -172,26 +186,28 @@ public class MainActivity extends Activity implements AudioEventListener,
 		} else {
 			mViewPager.setAdapter(new WalksPagerAdapter());
 			mViewPager.setVisibility(View.VISIBLE);
+
+			mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+				@Override
+				public void onPageSelected(int arg0) {
+					walkSelected(arg0);
+				}
+
+				@Override
+				public void onPageScrolled(int arg0, float arg1, int arg2) {
+				}
+
+				@Override
+				public void onPageScrollStateChanged(int arg0) {
+				}
+			});
+
+			((CirclePageIndicator)findViewById(R.id.vp_indicator)).setViewPager(mViewPager);
 		}
 		mButton = (Button) findViewById(R.id.button_start_stop);
 
 		walkSelected(0);
-
-		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-			@Override
-			public void onPageSelected(int arg0) {
-				walkSelected(arg0);
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-			}
-		});
 	}
 
 	protected void walkSelected(int arg0) {
@@ -373,6 +389,8 @@ public class MainActivity extends Activity implements AudioEventListener,
 					.getFormattedDistanceTo(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)));
 			
 			Log.v(TAG, walk.getTitle());
+			
+			ImageLoader.getInstance().displayImage(Constants.HEARUSHERE_BASE_URL + walk.getImage(), (ImageView) root.findViewById(R.id.iv_item_logo));
 
 			root.setOnClickListener(new View.OnClickListener() {
 				@Override

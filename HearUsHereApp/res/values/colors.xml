@@ -3,6 +3,9 @@
     <color name="notification_bg">#aa000000</color>
     <color name="notification_fg">#ffffff</color>
 
+    <color name="main_fg">#ffffff</color>
+    <color name="main_bg">#000000</color>
+    
     <color name="polygon_stroke">#ff0000</color>
     <color name="polygon_fill">#33ff0000</color>
 </resources>

@@ -1,41 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent" xmlns:app="http://schemas.android.com/apk/res/nl.hearushere.app">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/vp_walks"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" >
-        </android.support.v4.view.ViewPager>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/vp_walks"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </android.support.v4.view.ViewPager>
+            
+            <com.viewpagerindicator.CirclePageIndicator
+                android:id="@+id/vp_indicator"
+                app:fillColor="#ffffff"
+                app:pageColor="#333333"
+                app:radius="5dp"
+                app:strokeWidth="0dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="center|bottom">
+            </com.viewpagerindicator.CirclePageIndicator>
+            
+        </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2" >
+            android:layout_weight="3" >
 
             <fragment
                 android:id="@+id/map"
                 android:name="com.google.android.gms.maps.MapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-            
+
             <TextView
                 android:id="@+id/tv_notification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="0"
                 android:background="@color/notification_bg"
                 android:gravity="center"
                 android:padding="8dp"
-                android:textColor="@color/notification_fg"
-                android:alpha="0" />
-
+                android:textColor="@color/notification_fg" />
         </FrameLayout>
     </LinearLayout>
 
