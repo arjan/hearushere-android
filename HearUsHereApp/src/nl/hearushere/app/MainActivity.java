@@ -45,11 +45,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
-import com.viewpagerindicator.CirclePageIndicator;
+import com.viewpagerindicator.PageIndicator;
 
 public class MainActivity extends Activity implements AudioEventListener,
 		OnMapClickListener {
@@ -136,8 +135,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		}
 		mLastMapWalk = walk;
 		
-		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-				.getMap();
+		mMap = getMapFragment().getMap();
 		mMap.setMyLocationEnabled(true);
 		mMap.clear();
 
@@ -170,6 +168,10 @@ public class MainActivity extends Activity implements AudioEventListener,
 		});
 	}
 
+	private MapFragment getMapFragment() {
+		return (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -187,7 +189,10 @@ public class MainActivity extends Activity implements AudioEventListener,
 			mViewPager.setAdapter(new WalksPagerAdapter());
 			mViewPager.setVisibility(View.VISIBLE);
 
-			mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+			PageIndicator indicator = (PageIndicator)findViewById(R.id.vp_indicator);
+			indicator.setViewPager(mViewPager);
+			
+			indicator.setOnPageChangeListener(new OnPageChangeListener() {
 
 				@Override
 				public void onPageSelected(int arg0) {
@@ -202,8 +207,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 				public void onPageScrollStateChanged(int arg0) {
 				}
 			});
-
-			((CirclePageIndicator)findViewById(R.id.vp_indicator)).setViewPager(mViewPager);
 		}
 		mButton = (Button) findViewById(R.id.button_start_stop);
 
@@ -395,7 +398,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 			root.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-
 				}
 			});
 
