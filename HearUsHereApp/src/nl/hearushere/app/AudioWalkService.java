@@ -85,6 +85,8 @@ public class AudioWalkService extends Service implements LocationListener {
 
 		public void stopService() {
 
+			mLocationManager.removeUpdates(AudioWalkService.this);
+
 			if (mTrackList != null) {
 				for (Track track : mTrackList) {
 					mVolumeHandler.removeMessages(track.getId());
@@ -100,10 +102,6 @@ public class AudioWalkService extends Service implements LocationListener {
 		}
 
 		public void startPlayback(Walk walk) {
-
-			// Register the listener with the Location Manager to receive location updates
-			mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, AudioWalkService.this);
-
 			if (mCurrentWalk != null) {
 				stopPlayback();
 			}
@@ -152,7 +150,6 @@ public class AudioWalkService extends Service implements LocationListener {
 		public void stopPlayback() {
 			mAudioEventListener.showLoader(false);
 			hideNotification();
-			mLocationManager.removeUpdates(AudioWalkService.this);
 			
 			if (mTrackList != null) {
 				for (Track track : mTrackList) {
@@ -203,7 +200,10 @@ public class AudioWalkService extends Service implements LocationListener {
 		mVolumeHandler = new VolumeManager(mHandlerThread.getLooper());
 
 		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		
+
+		// Register the listener with the Location Manager to receive location updates
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, AudioWalkService.this);
+
 		mAPI = new API(mSpiceManager);
 		mSpiceManager.start(this);
 	}
@@ -237,10 +237,14 @@ public class AudioWalkService extends Service implements LocationListener {
 						}
 					}
 				}
-				hideNotification();
 				mSoundStartTime = -1;
-				mSoundsLoaded = true;
-				showNotification("Please go to the area located on the map to begin.");
+				if (mTrackList != null) {
+					mSoundsLoaded = true;
+					showNotification("Please go to the area located on the map to begin.");
+				} else {
+					// starting aborted
+					hideNotification();
+				}
 			}
 		});
 	}

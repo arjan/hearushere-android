@@ -3,6 +3,7 @@ package nl.hearushere.app.data;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.location.Location;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -121,5 +122,19 @@ public class Walk {
 
 	public void setTracksSynchronized(boolean tracksSynchronized) {
 		this.tracksSynchronized = tracksSynchronized;
+	}
+
+	public String getFormattedDistanceTo(Location current) {
+
+		float[] results = new float[3];
+		Location.distanceBetween(location[0], location[1],
+				current.getLatitude(), current.getLongitude(), results);
+		double distance = results[0];
+		
+		if (distance > 1000) {
+			return String.format("%.2f km", distance/1000);
+		} else {
+			return String.format("%.0f m", distance);
+		}
 	}
 }

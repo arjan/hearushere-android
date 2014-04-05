@@ -10,10 +10,12 @@ import nl.hearushere.app.net.HttpSpiceService;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.view.PagerAdapter;
@@ -63,6 +65,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 	private ArrayList<Walk> mWalks;
 	private Button mButton;
 	private ViewPager mViewPager;
+	private LocationManager mLocationManager;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -72,6 +75,8 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		mTvNotification = (TextView) findViewById(R.id.tv_notification);
 		mProgress = findViewById(R.id.progress);
+
+		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
 		Constants.SOUNDCLOUD_CLIENT_ID = getResources().getString(
 				R.string.area_soundcloud_client_id);
@@ -269,12 +274,12 @@ public class MainActivity extends Activity implements AudioEventListener,
 	@Override
 	public void showNotification(String text) {
 		mTvNotification.setText(text);
-		mTvNotification.setVisibility(View.VISIBLE);
+		mTvNotification.animate().alpha(1f).setDuration(500).start();
 	}
 
 	@Override
 	public void hideNotification() {
-		mTvNotification.setVisibility(View.GONE);
+		mTvNotification.animate().alpha(0f).setDuration(500).start();
 	}
 
 	@Override
@@ -363,6 +368,10 @@ public class MainActivity extends Activity implements AudioEventListener,
 			final Walk walk = mWalks.get(position);
 			((TextView) root.findViewById(R.id.tv_item_title)).setText(walk
 					.getTitle());
+
+			((TextView) root.findViewById(R.id.tv_item_distance)).setText(walk
+					.getFormattedDistanceTo(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)));
+			
 			Log.v(TAG, walk.getTitle());
 
 			root.setOnClickListener(new View.OnClickListener() {

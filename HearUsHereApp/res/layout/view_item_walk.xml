@@ -11,6 +11,16 @@
         android:background="@color/notification_bg"
         android:gravity="center"
         android:padding="18dp"
+        android:textStyle="bold"
+        android:textColor="@color/notification_fg" />
+
+    <TextView
+        android:id="@+id/tv_item_distance"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:background="@color/notification_bg"
+        android:gravity="bottom|right"
         android:textColor="@color/notification_fg" />
 
 </FrameLayout>
