@@ -2,6 +2,7 @@ package nl.hearushere.app;
 
 import java.util.ArrayList;
 
+import nl.hearushere.app.R;
 import nl.hearushere.app.AudioWalkService.AudioEventListener;
 import nl.hearushere.app.AudioWalkService.LocalBinder;
 import nl.hearushere.app.data.Walk;
@@ -89,14 +90,13 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		mAPI = new API(mSpiceManager);
 
-		if (Constants.USE_HARDCODED_WALK) {
+		if (!getResources().getBoolean(R.bool.is_universal)) {
 			mWalks = new ArrayList<Walk>();
 			
 			Walk walk = Walk.create(this, getString(R.string.app_name), 
 					getString(R.string.static_soundcloud_user), 
 					R.array.static_audio_area);
 			walk.setTracksSynchronized(getResources().getBoolean(R.bool.static_tracks_synchronized));
-			
 			mWalks.add(walk);
 			
 		} else {
@@ -181,13 +181,14 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 	protected void initPager() {
 
+		View container = findViewById(R.id.fl_walk_info);
 		mViewPager = (ViewPager) findViewById(R.id.vp_walks);
 		
 		if (mWalks.size() == 1) {
-			mViewPager.setVisibility(View.GONE);
+			container.setVisibility(View.GONE);
 		} else {
 			mViewPager.setAdapter(new WalksPagerAdapter());
-			mViewPager.setVisibility(View.VISIBLE);
+			container.setVisibility(View.VISIBLE);
 
 			PageIndicator indicator = (PageIndicator)findViewById(R.id.vp_indicator);
 			indicator.setViewPager(mViewPager);

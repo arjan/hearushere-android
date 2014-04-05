@@ -4,9 +4,6 @@ public class Constants {
 
 	public static final boolean USE_DEBUG_LOCATION = false;
 	
-	public static boolean USE_HARDCODED_WALK = false;
-	public static boolean TRACKS_ARE_SYNCHRONIZED = true; // whether the tracks start at the same seek time
-	
 	public static final String SOUNDCLOUD_API_BASE_URL = "http://api.soundcloud.com/";
 	public static final String HEARUSHERE_BASE_URL = "http://www.hearushere.nl/";
 	

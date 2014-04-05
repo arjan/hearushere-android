@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import nl.hearushere.app.R;
 import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
 import nl.hearushere.app.net.API;
@@ -437,7 +438,7 @@ public class AudioWalkService extends Service implements LocationListener {
 				mSoundStartTime = Calendar.getInstance().getTimeInMillis();
 			}
 
-			if (Constants.TRACKS_ARE_SYNCHRONIZED) {
+			if (mCurrentWalk.areTracksSynchronized()) {
 				mp.seekTo((int) ((Calendar.getInstance().getTimeInMillis() - mSoundStartTime) % mTotalDuration));
 			}
 

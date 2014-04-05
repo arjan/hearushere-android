@@ -1,6 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
 
+    <target name="prepare-project">
+        <condition property="params.set">
+            <isset property="project"/>
+        </condition>
+        <property name="package.name"       value="nl.hearusheare.app.${project}" />
+        
+        <antcall target="app-refactor" />
+    </target>
+
+    <target name="prepare-universal">
+        <property name="package.name"       value="nl.hearushere.app" />
+        <property name="project" value="universal" />
+        <antcall target="app-refactor" />
+    </target>
+
+    <target name="app-refactor" >
+
+        <copy file="./configs/${project}.xml" tofile="./res/values/app_config.xml" overwrite="true" />
+        
+        <!--1st. Change the import package.R in all java classes -->
+        <replaceregexp
+            byline="false"
+            flags="g" >
+            <regexp pattern="import (nl.hearus.*).R;" />
+            <substitution expression="import ${package.name}.R;" />
+            <fileset
+                dir="src"
+                includes="**/*.java" />
+        </replaceregexp>
+
+        <!--1st. Change the import package.R in all java classes -->
+        <replaceregexp
+            byline="false"
+            flags="g" >
+            <regexp pattern="&quot;http://schemas.android.com/apk/res/nl.hearushere.*&quot;" />
+            <substitution expression="&quot;http://schemas.android.com/apk/res/${package.name}&quot;" />
+            <fileset
+                dir="res"
+                includes="**/*.xml" />
+        </replaceregexp>
+
+        <!--2nd. Change package name in the manifest -->
+        <replaceregexp byline="true" >
+            <regexp pattern="package=(.*)" />
+            <substitution expression="package=&quot;${package.name}&quot;" />
+            <fileset dir="." >
+                <include name="AndroidManifest.xml" />
+            </fileset>
+        </replaceregexp>
+    </target>
+
+    
     <target name="rename-release-with-version-number">
         <xmlproperty file="AndroidManifest.xml" 
                      prefix="themanifest" 
@@ -8,9 +60,9 @@
 
         <!--  see ${sdk.dir}/tools/ant/build.xml -set-release-mode -->
         <property name="out.packaged.file" 
-                  location="${out.absolute.dir}/${ant.project.name}-${themanifest.manifest.android:versionName}-release-unsigned.apk" />
+                  location="${out.absolute.dir}/${themanifest.manifest.package}-${themanifest.manifest.android:versionName}-release-unsigned.apk" />
         <property name="out.final.file" 
-                  location="${out.absolute.dir}/${ant.project.name}-${themanifest.manifest.android:versionName}-release.apk" />
+                  location="${out.absolute.dir}/${themanifest.manifest.package}-${themanifest.manifest.android:versionName}-release.apk" />
     </target>
     <target name="-set-release-mode"
          depends="rename-release-with-version-number,android_rules.-set-release-mode">
