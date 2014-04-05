@@ -5,7 +5,7 @@
         <condition property="params.set">
             <isset property="project"/>
         </condition>
-        <property name="package.name"       value="nl.hearusheare.app.${project}" />
+        <property name="package.name"       value="nl.hearushere.app.${project}" />
         
         <antcall target="app-refactor" />
     </target>
@@ -35,7 +35,7 @@
         <replaceregexp
             byline="false"
             flags="g" >
-            <regexp pattern="&quot;http://schemas.android.com/apk/res/nl.hearushere.*&quot;" />
+            <regexp pattern="&quot;http://schemas.android.com/apk/res/nl.hearu(.*)&quot;" />
             <substitution expression="&quot;http://schemas.android.com/apk/res/${package.name}&quot;" />
             <fileset
                 dir="res"
