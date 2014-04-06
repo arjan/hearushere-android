@@ -2,7 +2,6 @@ package nl.hearushere.app;
 
 import java.util.ArrayList;
 
-import nl.hearushere.app.R;
 import nl.hearushere.app.AudioWalkService.AudioEventListener;
 import nl.hearushere.app.AudioWalkService.LocalBinder;
 import nl.hearushere.app.data.Walk;
@@ -23,8 +22,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -97,6 +94,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 					getString(R.string.static_soundcloud_user), 
 					R.array.static_audio_area);
 			walk.setTracksSynchronized(getResources().getBoolean(R.bool.static_tracks_synchronized));
+			walk.setRadius(getResources().getInteger(R.integer.static_radius));
 			mWalks.add(walk);
 			
 		} else {

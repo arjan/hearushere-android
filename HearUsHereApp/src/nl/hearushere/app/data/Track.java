@@ -97,8 +97,8 @@ public class Track {
 		this.currentDistance = currentDistance;
 	}
 
-	public float getCalculatedVolume() {
-		if (currentDistance > Constants.MAX_SOUND_DISTANCE) {
+	public float getCalculatedVolume(int radius) {
+		if (currentDistance > radius) {
 			return 0f;
 		}
 		// Magic (c) James Bryan Graves :)
@@ -107,7 +107,7 @@ public class Track {
 						Math.min(
 								1.0,
 								Math.log(currentDistance
-										/ Constants.MAX_SOUND_DISTANCE)
+										/ radius)
 										* -0.5));
 	}
 

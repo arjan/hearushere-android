@@ -4,6 +4,7 @@
     <string name="app_name">Art Park</string>
     <bool name="is_universal">false</bool>
     
+    <integer name="static_radius">50</integer>
     <bool name="static_tracks_synchronized">true</bool>
 
     <string name="static_soundcloud_user">artpark-1</string>

@@ -52,5 +52,8 @@ public class API {
 		}, "tracks-" + userId, DurationInMillis.ONE_WEEK, requestListener);
 	}
 	
+	public void clearCache() {
+		mSpiceManager.removeAllDataFromCache();
+	}
 
 }

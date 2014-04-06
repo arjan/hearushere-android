@@ -34,6 +34,9 @@ public class Walk {
 	private double[] location;
 
 	@JsonProperty
+	private int radius;
+	
+	@JsonProperty
 	private String image;
 	
 	@JsonProperty
@@ -136,5 +139,13 @@ public class Walk {
 		} else {
 			return String.format("%.0f m", distance);
 		}
+	}
+
+	public int getRadius() {
+		return radius;
+	}
+
+	public void setRadius(int radius) {
+		this.radius = radius;
 	}
 }

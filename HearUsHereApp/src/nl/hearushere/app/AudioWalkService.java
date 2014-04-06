@@ -269,7 +269,7 @@ public class AudioWalkService extends Service implements LocationListener {
 
 			// if we are in range, we should play this track
 			if (shouldPlay) {
-				float volume = track.getCalculatedVolume();
+				float volume = track.getCalculatedVolume(mCurrentWalk.getRadius());
 				mVolumeHandler.fadeToVolume(track, volume, Constants.FADE_TIME);
 
 				soundsPlaying++;
