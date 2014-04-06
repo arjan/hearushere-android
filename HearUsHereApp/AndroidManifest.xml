@@ -34,6 +34,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="nl.hearushere.app.CreditsActivity"
+            android:label="@string/app_credits" >
+        </activity>
+
         <service
             android:name="nl.hearushere.app.AudioWalkService"
             android:exported="false" />

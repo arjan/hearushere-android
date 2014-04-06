@@ -3,6 +3,9 @@
 
     <string name="app_name">HearUsHere</string>
     <bool name="is_universal">true</bool>
+
+    <color name="main_fg">#ffffff</color>
+    <color name="main_bg">#000000</color>
     
     <!-- In universal mode, these are unused -->
     <integer name="static_radius">50</integer>

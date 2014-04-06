@@ -10,8 +10,19 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Utils {
 
+	private static ObjectMapper mapper;
+
+	static {
+		mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);		
+	}
+	
 	public static String stringHash(String mUrl) {
 		MessageDigest digest = null;
 		try {
@@ -52,4 +63,28 @@ public class Utils {
 		return context.getPackageName() + "/" + version + " (Android; "
 				+ Build.VERSION.RELEASE + ")";
 	}
+
+	public static ObjectMapper getObjectMapper() {
+		return mapper;
+	}
+	
+	public static String serialize(Object value, Class<?> clazz) {
+		if (value == null)
+			return null;
+		try {
+			return mapper.writeValueAsString(value);
+		} catch (JsonProcessingException e) {
+			return null;
+		}
+	}
+
+	public static <T> T deserialize(String value, Class<T> clazz) {
+		try {
+			return mapper.readValue(value, clazz);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 }

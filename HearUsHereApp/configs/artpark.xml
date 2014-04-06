@@ -4,6 +4,9 @@
     <string name="app_name">Art Park</string>
     <bool name="is_universal">false</bool>
     
+    <color name="main_fg">#ffffff</color>
+    <color name="main_bg">#2AAE0A</color>
+    
     <integer name="static_radius">50</integer>
     <bool name="static_tracks_synchronized">true</bool>
 

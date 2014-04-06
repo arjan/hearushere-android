@@ -355,6 +355,15 @@ public class MainActivity extends Activity implements AudioEventListener,
 				}).show();
 	}
 
+	protected void openWalkCredits(Walk walk) {
+		if (walk.getCredits() == null) {
+			return;
+		}
+		Intent intent = new Intent(this, CreditsActivity.class);
+		intent.putExtra("credits", Utils.serialize(walk, Walk.class));
+		startActivity(intent);
+	}
+
 	class WalksPagerAdapter extends PagerAdapter {
 
 		@Override
@@ -389,6 +398,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 			root.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					openWalkCredits(walk);
 				}
 			});
 

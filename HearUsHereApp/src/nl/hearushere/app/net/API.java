@@ -1,6 +1,7 @@
 package nl.hearushere.app.net;
 
 import nl.hearushere.app.Constants;
+import nl.hearushere.app.Utils;
 import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
 import nl.hearushere.app.data.Walk.List;
@@ -20,9 +21,8 @@ public class API {
 
 	public API(SpiceManager spiceManager) {
 		mSpiceManager = spiceManager;
-
-		mMapper = new ObjectMapper();
-		mMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		
+		mMapper = Utils.getObjectMapper();
 	}
 	
 	public void getWalks(RequestListener<Walk.List> listener) {
