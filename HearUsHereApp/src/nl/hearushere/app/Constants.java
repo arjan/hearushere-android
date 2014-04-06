@@ -9,7 +9,6 @@ public class Constants {
 	
 	public static final String CACHE_DIR = "hearushere";
 	
-	public static final double MAX_SOUND_DISTANCE = 50.0;
 	public static int MAX_SIMULTANEOUS_SOUNDS = 10;
 
 	public static String SOUNDCLOUD_CLIENT_ID;

@@ -109,6 +109,9 @@ public class AudioWalkService extends Service implements LocationListener {
 			mCurrentWalk = walk;
 			mTrackList = null;
 			
+			Log.v(TAG, "sync? " + (mCurrentWalk.areTracksSynchronized() ? "Yes" : "no"));
+			
+			
 			updateServiceNotification();
 
 			if (mAudioEventListener != null) {
@@ -224,7 +227,6 @@ public class AudioWalkService extends Service implements LocationListener {
 							+ getString(R.string.area_soundcloud_client_id);
 
 					if (!cacheFile.exists()) {
-						Log.v(TAG, "Loading track...");
 						showNotification(String.format(
 								getString(R.string.load_progress), i + 1,
 								mTrackList.size()));
@@ -262,7 +264,7 @@ public class AudioWalkService extends Service implements LocationListener {
 		int soundsPlaying = 0;
 		for (Track track : sorted) {
 			
-			boolean shouldPlay = track.getCurrentDistance() < Constants.MAX_SOUND_DISTANCE
+			boolean shouldPlay = track.getCurrentDistance() < mCurrentWalk.getRadius()
 					&& soundsPlaying < Constants.MAX_SIMULTANEOUS_SOUNDS;
 
 			MediaPlayer mp = track.getMediaPlayer();

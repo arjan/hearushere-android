@@ -3,15 +3,14 @@ package nl.hearushere.app.data;
 import java.io.File;
 import java.util.ArrayList;
 
-import nl.hearushere.app.Constants;
 import nl.hearushere.app.Utils;
 import android.content.Context;
 import android.media.MediaPlayer;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.google.android.gms.maps.model.LatLng;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)

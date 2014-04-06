@@ -75,12 +75,14 @@ public class MainActivity extends Activity implements AudioEventListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		ImageLoader.getInstance().init(new ImageLoaderConfiguration.Builder(this).build());
-		
+		ImageLoader.getInstance().init(
+				new ImageLoaderConfiguration.Builder(this).build());
+
 		mTvNotification = (TextView) findViewById(R.id.tv_notification);
 		mProgress = findViewById(R.id.progress);
 
-		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		mLocationManager = (LocationManager) this
+				.getSystemService(Context.LOCATION_SERVICE);
 
 		Constants.SOUNDCLOUD_CLIENT_ID = getResources().getString(
 				R.string.area_soundcloud_client_id);
@@ -89,14 +91,15 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		if (!getResources().getBoolean(R.bool.is_universal)) {
 			mWalks = new ArrayList<Walk>();
-			
-			Walk walk = Walk.create(this, getString(R.string.app_name), 
-					getString(R.string.static_soundcloud_user), 
+
+			Walk walk = Walk.create(this, getString(R.string.app_name),
+					getString(R.string.static_soundcloud_user),
 					R.array.static_audio_area);
-			walk.setTracksSynchronized(getResources().getBoolean(R.bool.static_tracks_synchronized));
+			walk.setTracksSynchronized(getResources().getBoolean(
+					R.bool.static_tracks_synchronized));
 			walk.setRadius(getResources().getInteger(R.integer.static_radius));
 			mWalks.add(walk);
-			
+
 		} else {
 			// universal
 			showLoader(true);
@@ -125,14 +128,14 @@ public class MainActivity extends Activity implements AudioEventListener,
 	}
 
 	private Walk mLastMapWalk = null;
-	
+
 	private void initMap(final Walk walk) {
 
 		if (mLastMapWalk == walk) {
 			return;
 		}
 		mLastMapWalk = walk;
-		
+
 		mMap = getMapFragment().getMap();
 		mMap.setMyLocationEnabled(true);
 		mMap.clear();
@@ -181,16 +184,16 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		View container = findViewById(R.id.fl_walk_info);
 		mViewPager = (ViewPager) findViewById(R.id.vp_walks);
-		
+
 		if (mWalks.size() == 1) {
 			container.setVisibility(View.GONE);
 		} else {
 			mViewPager.setAdapter(new WalksPagerAdapter());
 			container.setVisibility(View.VISIBLE);
 
-			PageIndicator indicator = (PageIndicator)findViewById(R.id.vp_indicator);
+			PageIndicator indicator = (PageIndicator) findViewById(R.id.vp_indicator);
 			indicator.setViewPager(mViewPager);
-			
+
 			indicator.setOnPageChangeListener(new OnPageChangeListener() {
 
 				@Override
@@ -259,7 +262,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 				mServiceInterface = (AudioWalkService.LocalBinder) service;
 				Log.v(TAG, "Bound to service!");
 				mServiceInterface.setAudioEventListener(MainActivity.this);
-				
+
 				if (mWalks != null && mViewPager == null) {
 					initPager();
 				}
@@ -373,12 +376,15 @@ public class MainActivity extends Activity implements AudioEventListener,
 			((TextView) root.findViewById(R.id.tv_item_title)).setText(walk
 					.getTitle());
 
-			((TextView) root.findViewById(R.id.tv_item_distance)).setText(walk
-					.getFormattedDistanceTo(mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)));
-			
+			((TextView) root.findViewById(R.id.tv_item_distance))
+					.setText(walk.getFormattedDistanceTo(mLocationManager
+							.getLastKnownLocation(LocationManager.GPS_PROVIDER)));
+
 			Log.v(TAG, walk.getTitle());
-			
-			ImageLoader.getInstance().displayImage(Constants.HEARUSHERE_BASE_URL + walk.getImage(), (ImageView) root.findViewById(R.id.iv_item_logo));
+
+			ImageLoader.getInstance().displayImage(
+					Constants.HEARUSHERE_BASE_URL + walk.getImage(),
+					(ImageView) root.findViewById(R.id.iv_item_logo));
 
 			root.setOnClickListener(new View.OnClickListener() {
 				@Override

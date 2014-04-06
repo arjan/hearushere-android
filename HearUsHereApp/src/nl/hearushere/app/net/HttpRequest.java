@@ -1,7 +1,5 @@
 package nl.hearushere.app.net;
 
-import nl.hearushere.app.Constants;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

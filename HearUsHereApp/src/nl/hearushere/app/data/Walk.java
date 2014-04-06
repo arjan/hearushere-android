@@ -45,7 +45,7 @@ public class Walk {
 	@JsonProperty
 	private String description;
 	
-	@JsonProperty
+	@JsonProperty("autoplay")
 	private boolean tracksSynchronized;
 	
 	public static Walk create(Context context, String title, String scUser, int areaRes) {
