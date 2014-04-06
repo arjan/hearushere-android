@@ -68,19 +68,6 @@
         android:id="@+id/button_start_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
-        android:layout_margin="4dp"
-        android:onClick="clickCredits"
-        android:textColor="@color/main_fg"
-        android:background="@color/main_bg"
-        android:text="credits"
-        android:textStyle="bold"
-        android:textSize="10sp" />
-
-    <Button
-        android:id="@+id/button_start_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_gravity="bottom|left"
         android:layout_margin="4dp"
         android:onClick="clickStartStop"
