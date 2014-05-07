@@ -2,6 +2,7 @@ package nl.hearushere.app;
 
 import java.util.ArrayList;
 
+import nl.hearushere.app.artpark.R;
 import nl.hearushere.app.AudioWalkService.AudioEventListener;
 import nl.hearushere.app.AudioWalkService.LocalBinder;
 import nl.hearushere.app.data.Walk;
@@ -22,6 +23,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -68,6 +71,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 	private Button mButton;
 	private ViewPager mViewPager;
 	private LocationManager mLocationManager;
+	private boolean mIsUniversal;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -89,7 +93,8 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		mAPI = new API(mSpiceManager);
 
-		if (!getResources().getBoolean(R.bool.is_universal)) {
+		mIsUniversal = getResources().getBoolean(R.bool.is_universal);
+		if (!mIsUniversal) {
 			mWalks = new ArrayList<Walk>();
 
 			Walk walk = Walk.create(this, getString(R.string.app_name),
@@ -98,6 +103,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 			walk.setTracksSynchronized(getResources().getBoolean(
 					R.bool.static_tracks_synchronized));
 			walk.setRadius(getResources().getInteger(R.integer.static_radius));
+			walk.setCredits(getString(R.string.static_credits_url));
 			mWalks.add(walk);
 
 		} else {
@@ -187,7 +193,9 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		if (mWalks.size() == 1) {
 			container.setVisibility(View.GONE);
+			
 		} else {
+
 			mViewPager.setAdapter(new WalksPagerAdapter());
 			container.setVisibility(View.VISIBLE);
 
@@ -212,6 +220,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		}
 		mButton = (Button) findViewById(R.id.button_start_stop);
 
+		invalidateOptionsMenu();
 		walkSelected(0);
 	}
 
@@ -250,6 +259,25 @@ public class MainActivity extends Activity implements AudioEventListener,
 	protected void onStop() {
 		mSpiceManager.shouldStop();
 		super.onStop();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_main, menu);
+		if (!mIsUniversal) {
+			menu.findItem(R.id.menu_credits).setVisible(true);
+		}
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_credits:
+			openWalkCredits(mWalks.get(0));
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void connectAudioService() {

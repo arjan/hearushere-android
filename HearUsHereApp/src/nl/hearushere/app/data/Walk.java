@@ -129,6 +129,10 @@ public class Walk {
 
 	public String getFormattedDistanceTo(Location current) {
 
+		if (current == null) {
+			return "";
+		}
+		
 		float[] results = new float[3];
 		Location.distanceBetween(location[0], location[1],
 				current.getLatitude(), current.getLongitude(), results);

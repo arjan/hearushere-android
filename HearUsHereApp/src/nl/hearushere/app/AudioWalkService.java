@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import nl.hearushere.app.R;
+import nl.hearushere.app.artpark.R;
 import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
 import nl.hearushere.app.net.API;
@@ -60,7 +60,7 @@ public class AudioWalkService extends Service implements LocationListener {
 
 	private static int INTENT_ONGOING_ID = 1001;
 	private static int INTENT_ACTIVITY_ID = 1002;
-	private static final int LOCATION_TIME_DELTA = 1000 * 60 * 2;
+	private static final int LOCATION_TIME_DELTA = 1000 * 30;
 
 	public AudioEventListener mAudioEventListener;
 	private LocalBinder mBinder = new LocalBinder();
@@ -206,7 +206,7 @@ public class AudioWalkService extends Service implements LocationListener {
 		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
 		// Register the listener with the Location Manager to receive location updates
-		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, AudioWalkService.this);
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, AudioWalkService.this);
 
 		mAPI = new API(mSpiceManager);
 		mSpiceManager.start(this);
@@ -540,27 +540,15 @@ public class AudioWalkService extends Service implements LocationListener {
 	    boolean isMoreAccurate = accuracyDelta < 0;
 	    boolean isSignificantlyLessAccurate = accuracyDelta > 200;
 
-	    // Check if the old and new location are from the same provider
-	    boolean isFromSameProvider = isSameProvider(location.getProvider(),
-	            currentBestLocation.getProvider());
-
 	    // Determine location quality using a combination of timeliness and accuracy
 	    if (isMoreAccurate) {
 	        return true;
 	    } else if (isNewer && !isLessAccurate) {
 	        return true;
-	    } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+	    } else if (isNewer && !isSignificantlyLessAccurate) {
 	        return true;
 	    }
 	    return false;
 	}
 
-	/** Checks whether two providers are the same */
-	private boolean isSameProvider(String provider1, String provider2) {
-	    if (provider1 == null) {
-	      return provider2 == null;
-	    }
-	    return provider1.equals(provider2);
-	}
-	
 }
