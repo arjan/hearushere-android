@@ -16,6 +16,15 @@ public class Walk {
 	public static class List extends ArrayList<Walk> {
 
 		private static final long serialVersionUID = 1L;
+		
+		public Walk findBySoundcloudUser(String scUser) {
+			for (Walk w : this) {
+				if (w.getScUser().equals(scUser)) {
+					return w;
+				}
+			}
+			return null;
+		}
 
 	}
 
@@ -47,25 +56,6 @@ public class Walk {
 	
 	@JsonProperty("autoplay")
 	private boolean tracksSynchronized;
-	
-	public static Walk create(Context context, String title, String scUser, int areaRes) {
-		Walk walk = new Walk();
-		walk.title = title;
-		walk.scUser = scUser;
-
-		String[] source = context.getResources().getStringArray(areaRes);
-		walk.area = new double[source.length*2];
-		int i=0;
-		for (String line : source) {
-			String[] m = line.split(" ");
-			assert (m.length == 2);
-			double lat = Double.parseDouble(m[0]);
-			double lng = Double.parseDouble(m[1]);
-			walk.area[i++] = lat;
-			walk.area[i++] = lng;
-		}
-		return walk;
-	}
 	
 	public ArrayList<LatLng> getPoints() {
 		ArrayList<LatLng> result = new ArrayList<LatLng>();

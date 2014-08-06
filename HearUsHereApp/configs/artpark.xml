@@ -6,24 +6,10 @@
     
     <color name="main_fg">#ffffff</color>
     <color name="main_bg">#2AAE0A</color>
+
+    <color name="polygon_stroke">#ff0000</color>
+    <color name="polygon_fill">#33ff0000</color>
     
-    <string name="static_credits_url">walks/artpark-credits.html</string>
-    <integer name="static_radius">50</integer>
-    <bool name="static_tracks_synchronized">true</bool>
-
-    <string name="static_soundcloud_user">artpark-1</string>
-
-    <string-array name="static_audio_area">
-        <item>52.357655 4.864954</item>
-        <item>52.357170 4.864342</item>
-        <item>52.356711 4.863414</item>
-        <item>52.356652 4.862748</item>
-        <item>52.356285 4.862427</item>
-        <item>52.355978 4.861665</item>
-        <item>52.355630 4.860377</item>
-        <item>52.356489 4.858832</item>
-        <item>52.357524 4.860528</item>
-        <item>52.358179 4.863156</item>
-    </string-array>
+    <string name="soundcloud_user">artpark-1</string>
 
 </resources>

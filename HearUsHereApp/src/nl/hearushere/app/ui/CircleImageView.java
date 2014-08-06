@@ -1,6 +1,6 @@
 package nl.hearushere.app.ui;
 
-import nl.hearushere.app.artpark.R;
+import nl.hearushere.app.extrapool.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;

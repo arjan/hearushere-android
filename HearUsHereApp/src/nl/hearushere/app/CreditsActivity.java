@@ -1,6 +1,6 @@
 package nl.hearushere.app;
 
-import nl.hearushere.app.artpark.R;
+import nl.hearushere.app.extrapool.R;
 import nl.hearushere.app.data.Walk;
 import android.app.Activity;
 import android.graphics.Bitmap;

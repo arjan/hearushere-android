@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import nl.hearushere.app.artpark.R;
+import nl.hearushere.app.extrapool.R;
 import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
 import nl.hearushere.app.net.API;

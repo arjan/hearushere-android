@@ -1,8 +1,10 @@
 package nl.hearushere.app;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import nl.hearushere.app.artpark.R;
+import nl.hearushere.app.extrapool.R;
 import nl.hearushere.app.AudioWalkService.AudioEventListener;
 import nl.hearushere.app.AudioWalkService.LocalBinder;
 import nl.hearushere.app.data.Walk;
@@ -67,7 +69,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 	private API mAPI;
 	private View mProgress;
 	private Marker mDebugMarker;
-	private ArrayList<Walk> mWalks;
+	private List<Walk> mWalks;
 	private Button mButton;
 	private ViewPager mViewPager;
 	private LocationManager mLocationManager;
@@ -94,38 +96,27 @@ public class MainActivity extends Activity implements AudioEventListener,
 		mAPI = new API(mSpiceManager);
 
 		mIsUniversal = getResources().getBoolean(R.bool.is_universal);
-		if (!mIsUniversal) {
-			mWalks = new ArrayList<Walk>();
+		showLoader(true);
+		mAPI.getWalks(new RequestListener<Walk.List>() {
 
-			Walk walk = Walk.create(this, getString(R.string.app_name),
-					getString(R.string.static_soundcloud_user),
-					R.array.static_audio_area);
-			walk.setTracksSynchronized(getResources().getBoolean(
-					R.bool.static_tracks_synchronized));
-			walk.setRadius(getResources().getInteger(R.integer.static_radius));
-			walk.setCredits(getString(R.string.static_credits_url));
-			mWalks.add(walk);
+			@Override
+			public void onRequestFailure(SpiceException arg0) {
+				showLoader(false);
+				showNetworkErrorMessage();
+			}
 
-		} else {
-			// universal
-			showLoader(true);
-			mAPI.getWalks(new RequestListener<Walk.List>() {
-
-				@Override
-				public void onRequestFailure(SpiceException arg0) {
-					showLoader(false);
-					showNetworkErrorMessage();
+			@Override
+			public void onRequestSuccess(Walk.List walks) {
+				showLoader(false);
+				if (mIsUniversal) {
+					mWalks = walks;
+				} else {
+					mWalks = Arrays.asList(walks
+							.findBySoundcloudUser(getString(R.string.soundcloud_user)));
 				}
-
-				@Override
-				public void onRequestSuccess(Walk.List arg0) {
-					showLoader(false);
-					mWalks = arg0;
-					System.out.println("woot");
-					initPager();
-				}
-			});
-		}
+				initPager();
+			}
+		});
 	}
 
 	@Override
@@ -166,7 +157,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 						.addAll(points)
 						.strokeColor(
 								getResources().getColor(R.color.polygon_stroke))
-						.strokeWidth(3f)
+						.strokeWidth(8f)
 						.fillColor(
 								getResources().getColor(R.color.polygon_fill)));
 
@@ -193,7 +184,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		if (mWalks.size() == 1) {
 			container.setVisibility(View.GONE);
-			
+
 		} else {
 
 			mViewPager.setAdapter(new WalksPagerAdapter());
@@ -260,7 +251,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		mSpiceManager.shouldStop();
 		super.onStop();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -269,7 +260,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		}
 		return super.onCreateOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

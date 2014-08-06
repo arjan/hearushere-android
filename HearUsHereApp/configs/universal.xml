@@ -6,13 +6,10 @@
     
     <color name="main_fg">#ffffff</color>
     <color name="main_bg">#000000</color>
+
+    <color name="polygon_stroke">#ff0000</color>
+    <color name="polygon_fill">#33ff0000</color>
     
-    <!-- In universal mode, these are unused -->
-    <integer name="static_radius">50</integer>
-    <bool name="static_tracks_synchronized">true</bool>
-    <string name="static_soundcloud_user">unused</string>
-    <string name="static_credits_url">unused</string>
-    <string-array name="static_audio_area">
-    </string-array>
+    <string name="soundcloud_user">unused</string>
 
 </resources>
