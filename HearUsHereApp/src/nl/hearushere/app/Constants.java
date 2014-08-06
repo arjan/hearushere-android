@@ -2,7 +2,7 @@ package nl.hearushere.app;
 
 public class Constants {
 
-	public static final boolean USE_DEBUG_LOCATION = true;
+	public static final boolean USE_DEBUG_LOCATION = false;
 	
 	public static final String SOUNDCLOUD_API_BASE_URL = "http://api.soundcloud.com/";
 	public static final String HEARUSHERE_BASE_URL = "http://www.hearushere.nl/";

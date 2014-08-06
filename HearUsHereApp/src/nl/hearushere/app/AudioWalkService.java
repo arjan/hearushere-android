@@ -102,7 +102,7 @@ public class AudioWalkService extends Service implements LocationListener {
 			stopSelf();
 		}
 
-		public void startPlayback(Walk walk) {
+		public void startPlayback(final Walk walk) {
 			if (mCurrentWalk != null) {
 				stopPlayback();
 			}
@@ -124,6 +124,10 @@ public class AudioWalkService extends Service implements LocationListener {
 						public void onRequestSuccess(Track.List list) {
 							if (mAudioEventListener != null) {
 								mAudioEventListener.showLoader(false);
+							}
+							
+							for (Track t : list) {
+								t.determineLocationAndRadius(walk.getRadius());
 							}
 
 							// if (Constants.USE_DEBUG_LOCATION) {
@@ -264,7 +268,7 @@ public class AudioWalkService extends Service implements LocationListener {
 		int soundsPlaying = 0;
 		for (Track track : sorted) {
 			
-			boolean shouldPlay = track.getCurrentDistance() < mCurrentWalk.getRadius()
+			boolean shouldPlay = track.getCurrentDistance() < track.getRadius()
 					&& soundsPlaying < Constants.MAX_SIMULTANEOUS_SOUNDS;
 
 			MediaPlayer mp = track.getMediaPlayer();

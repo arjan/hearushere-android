@@ -38,6 +38,9 @@ public class Track {
 	private LatLng location;
 
 	@JsonIgnore
+	private int radius;
+
+	@JsonIgnore
 	private MediaPlayer mediaPlayer;
 
 	@JsonIgnore
@@ -76,15 +79,6 @@ public class Track {
 	}
 
 	public LatLng getLocation() {
-		if (location == null) {
-			// geo:lat=52.374351 geo:lon=4.852556
-			String[] parts = tagList.split(" ");
-			if (parts.length == 2) {
-				double lat = Double.parseDouble(parts[0].split("=")[1]);
-				double lng = Double.parseDouble(parts[1].split("=")[1]);
-				location = new LatLng(lat, lng);
-			}
-		}
 		return location;
 	}
 
@@ -101,13 +95,8 @@ public class Track {
 			return 0f;
 		}
 		// Magic (c) James Bryan Graves :)
-		return (float) Math
-				.max(0.0,
-						Math.min(
-								1.0,
-								Math.log(currentDistance
-										/ radius)
-										* -0.5));
+		return (float) Math.max(0.0,
+				Math.min(1.0, Math.log(currentDistance / radius) * -0.5));
 	}
 
 	public MediaPlayer getMediaPlayer() {
@@ -138,5 +127,41 @@ public class Track {
 			} catch (IllegalStateException e) {
 			}
 		}
+	}
+
+	public void determineLocationAndRadius(int defaultRadius) {
+		double lat = 0.0, lng = 0.0;
+		int radius = 0;
+		boolean hasLat = false, hasLng = false, hasRadius = false;
+
+		// geo:lat=52.374351 geo:lon=4.852556 radius=444
+
+		String[] parts = tagList.split(" ");
+		for (String part : parts) {
+			try {
+				if (part.startsWith("geo:lat")) {
+					lat = Double.parseDouble(part.split("=")[1]);
+					hasLat = true;
+				}
+				else if (part.startsWith("geo:lon")) {
+					lng = Double.parseDouble(part.split("=")[1]);
+					hasLng = true;
+				}
+				else if (part.contains("radius")) {
+					radius = Integer.parseInt(part.split("=")[1]);
+					hasRadius = true;
+				}
+			} catch (Exception e) {
+			}
+		}
+		if (hasLat && hasLng) {
+			location = new LatLng(lat, lng);
+		}
+		this.radius = hasRadius ? radius : defaultRadius;
+	}
+
+	public double getRadius() {
+		System.out.println("radius: " + this.radius);
+		return this.radius;
 	}
 }

@@ -44,8 +44,10 @@ public class API {
 
 			@Override
 			public Track.List loadDataFromNetwork() throws Exception {
+				String url = Constants.SOUNDCLOUD_API_BASE_URL + "users/" + userId + "/tracks.json?offset=0&limit=250&client_id=" + Constants.SOUNDCLOUD_CLIENT_ID;
+				System.out.println("URL: " + url);
 				JsonNode node = HttpRequest.doRequest("GET",
-						Constants.SOUNDCLOUD_API_BASE_URL + "users/" + userId + "/tracks.json?offset=0&limit=250&client_id=" + Constants.SOUNDCLOUD_CLIENT_ID, null);
+						url, null);
 				return mMapper.treeToValue(node, Track.List.class);
 			}
 
