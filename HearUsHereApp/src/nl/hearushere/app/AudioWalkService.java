@@ -108,10 +108,10 @@ public class AudioWalkService extends Service implements LocationListener {
 			}
 			mCurrentWalk = walk;
 			mTrackList = null;
-			
-			Log.v(TAG, "sync? " + (mCurrentWalk.areTracksSynchronized() ? "Yes" : "no"));
-			
-			
+
+			Log.v(TAG, "sync? "
+					+ (mCurrentWalk.areTracksSynchronized() ? "Yes" : "no"));
+
 			updateServiceNotification();
 
 			if (mAudioEventListener != null) {
@@ -125,7 +125,7 @@ public class AudioWalkService extends Service implements LocationListener {
 							if (mAudioEventListener != null) {
 								mAudioEventListener.showLoader(false);
 							}
-							
+
 							for (Track t : list) {
 								t.determineLocationAndRadius(walk.getRadius());
 							}
@@ -158,7 +158,7 @@ public class AudioWalkService extends Service implements LocationListener {
 		public void stopPlayback() {
 			mAudioEventListener.showLoader(false);
 			hideNotification();
-			
+
 			if (mTrackList != null) {
 				for (Track track : mTrackList) {
 					mVolumeHandler.removeMessages(track.getId());
@@ -207,10 +207,13 @@ public class AudioWalkService extends Service implements LocationListener {
 		mHandler = new Handler(mHandlerThread.getLooper());
 		mVolumeHandler = new VolumeManager(mHandlerThread.getLooper());
 
-		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		mLocationManager = (LocationManager) this
+				.getSystemService(Context.LOCATION_SERVICE);
 
-		// Register the listener with the Location Manager to receive location updates
-		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, AudioWalkService.this);
+		// Register the listener with the Location Manager to receive location
+		// updates
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				0, 0, AudioWalkService.this);
 
 		mAPI = new API(mSpiceManager);
 		mSpiceManager.start(this);
@@ -260,14 +263,20 @@ public class AudioWalkService extends Service implements LocationListener {
 		if (mTrackList == null) {
 			return;
 		}
-		
+
 		Log.v(TAG, "LOCATION UPDATE " + location.toString());
+
+		if (!isInsideMapArea(location)) {
+			showNotification("You are too far away from the sounds, please move closer.");
+		} else {
+			hideNotification();
+		}
 		List<Track> sorted = getDistanceSortedTracks(location);
 
 		// loop through all sounds
 		int soundsPlaying = 0;
 		for (Track track : sorted) {
-			
+
 			boolean shouldPlay = track.getCurrentDistance() < track.getRadius()
 					&& soundsPlaying < Constants.MAX_SIMULTANEOUS_SOUNDS;
 
@@ -275,7 +284,8 @@ public class AudioWalkService extends Service implements LocationListener {
 
 			// if we are in range, we should play this track
 			if (shouldPlay) {
-				float volume = track.getCalculatedVolume(mCurrentWalk.getRadius());
+				float volume = track.getCalculatedVolume(mCurrentWalk
+						.getRadius());
 				mVolumeHandler.fadeToVolume(track, volume, Constants.FADE_TIME);
 
 				soundsPlaying++;
@@ -287,12 +297,52 @@ public class AudioWalkService extends Service implements LocationListener {
 			}
 		}
 
-		if (soundsPlaying == 0) {
-			showNotification("You are too far away from the sounds, please move closer.");
-		} else {
-			hideNotification();
+	}
+
+	private boolean isInsideMapArea(LatLng location) {
+		ArrayList<LatLng> polyLoc = mCurrentWalk.getPoints();
+
+		if (location == null)
+			return false;
+		
+		LatLng lastPoint = polyLoc.get(polyLoc.size() - 1);
+		boolean isInside = false;
+		double x = location.longitude;
+
+		for (LatLng point : polyLoc) {
+			double x1 = lastPoint.longitude;
+			double x2 = point.longitude;
+			double dx = x2 - x1;
+
+			if (Math.abs(dx) > 180.0) {
+				// we have, most likely, just jumped the dateline (could do
+				// further validation to this effect if needed). normalise the
+				// numbers.
+				if (x > 0) {
+					while (x1 < 0)
+						x1 += 360;
+					while (x2 < 0)
+						x2 += 360;
+				} else {
+					while (x1 > 0)
+						x1 -= 360;
+					while (x2 > 0)
+						x2 -= 360;
+				}
+				dx = x2 - x1;
+			}
+
+			if ((x1 <= x && x2 > x) || (x1 >= x && x2 < x)) {
+				double grad = (point.latitude - lastPoint.latitude) / dx;
+				double intersectAtLat = lastPoint.latitude + ((x - x1) * grad);
+
+				if (intersectAtLat > location.latitude)
+					isInside = !isInside;
+			}
+			lastPoint = point;
 		}
 
+		return isInside;
 	}
 
 	private List<Track> getDistanceSortedTracks(LatLng position) {
@@ -334,25 +384,28 @@ public class AudioWalkService extends Service implements LocationListener {
 
 		return START_STICKY;
 	}
-	
+
 	private void updateServiceNotification() {
-		((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).notify(INTENT_ONGOING_ID, buildServiceNotification());
+		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+				.notify(INTENT_ONGOING_ID, buildServiceNotification());
 	}
 
 	private Notification buildServiceNotification() {
 		Intent startIntent = new Intent(this, MainActivity.class);
 		startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		PendingIntent p = PendingIntent.getActivity(this,
-				INTENT_ACTIVITY_ID, startIntent, 0);
+		PendingIntent p = PendingIntent.getActivity(this, INTENT_ACTIVITY_ID,
+				startIntent, 0);
 
 		Notification notification = new NotificationCompat.Builder(this)
 				.setOngoing(true)
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentIntent(p)
-				.setContentTitle(mCurrentWalk == null ? getString(R.string.app_name) : mCurrentWalk.getTitle())
+				.setContentTitle(
+						mCurrentWalk == null ? getString(R.string.app_name)
+								: mCurrentWalk.getTitle())
 				.setContentText(
-						getString(mCurrentWalk == null ? R.string.notification_not_started_text : R.string.notification_progress_text))
-				.build();
+						getString(mCurrentWalk == null ? R.string.notification_not_started_text
+								: R.string.notification_progress_text)).build();
 		return notification;
 	}
 
@@ -474,24 +527,25 @@ public class AudioWalkService extends Service implements LocationListener {
 	@Override
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	public void onLocationChanged(final Location location) {
-		if (location == null || !mSoundsLoaded || mTrackList == null || Constants.USE_DEBUG_LOCATION) {
+		if (location == null || !mSoundsLoaded || mTrackList == null
+				|| Constants.USE_DEBUG_LOCATION) {
 			return;
 		}
 
@@ -499,7 +553,7 @@ public class AudioWalkService extends Service implements LocationListener {
 			return;
 		}
 		mLastLocation = location;
-		
+
 		Runnable playLocationSounds = new Runnable() {
 			@Override
 			public void run() {
@@ -511,48 +565,57 @@ public class AudioWalkService extends Service implements LocationListener {
 		mHandler.postDelayed(playLocationSounds, 200);
 	}
 
+	/**
+	 * Determines whether one Location reading is better than the current
+	 * Location fix
+	 * 
+	 * @param location
+	 *            The new Location that you want to evaluate
+	 * @param currentBestLocation
+	 *            The current Location fix, to which you want to compare the new
+	 *            one
+	 */
+	protected boolean isBetterLocation(Location location,
+			Location currentBestLocation) {
+		if (currentBestLocation == null) {
+			// A new location is always better than no location
+			return true;
+		}
 
-	
-	/** Determines whether one Location reading is better than the current Location fix
-	  * @param location  The new Location that you want to evaluate
-	  * @param currentBestLocation  The current Location fix, to which you want to compare the new one
-	  */
-	protected boolean isBetterLocation(Location location, Location currentBestLocation) {
-	    if (currentBestLocation == null) {
-	        // A new location is always better than no location
-	        return true;
-	    }
+		// Check whether the new location fix is newer or older
+		long timeDelta = location.getTime() - currentBestLocation.getTime();
+		boolean isSignificantlyNewer = timeDelta > LOCATION_TIME_DELTA;
+		boolean isSignificantlyOlder = timeDelta < -LOCATION_TIME_DELTA;
+		boolean isNewer = timeDelta > 0;
 
-	    // Check whether the new location fix is newer or older
-	    long timeDelta = location.getTime() - currentBestLocation.getTime();
-	    boolean isSignificantlyNewer = timeDelta > LOCATION_TIME_DELTA;
-	    boolean isSignificantlyOlder = timeDelta < -LOCATION_TIME_DELTA;
-	    boolean isNewer = timeDelta > 0;
+		// If it's been more than two minutes since the current location, use
+		// the new location
+		// because the user has likely moved
+		if (isSignificantlyNewer) {
+			return true;
+			// If the new location is more than two minutes older, it must be
+			// worse
+		} else if (isSignificantlyOlder) {
+			return false;
+		}
 
-	    // If it's been more than two minutes since the current location, use the new location
-	    // because the user has likely moved
-	    if (isSignificantlyNewer) {
-	        return true;
-	    // If the new location is more than two minutes older, it must be worse
-	    } else if (isSignificantlyOlder) {
-	        return false;
-	    }
+		// Check whether the new location fix is more or less accurate
+		int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation
+				.getAccuracy());
+		boolean isLessAccurate = accuracyDelta > 0;
+		boolean isMoreAccurate = accuracyDelta < 0;
+		boolean isSignificantlyLessAccurate = accuracyDelta > 200;
 
-	    // Check whether the new location fix is more or less accurate
-	    int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
-	    boolean isLessAccurate = accuracyDelta > 0;
-	    boolean isMoreAccurate = accuracyDelta < 0;
-	    boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-	    // Determine location quality using a combination of timeliness and accuracy
-	    if (isMoreAccurate) {
-	        return true;
-	    } else if (isNewer && !isLessAccurate) {
-	        return true;
-	    } else if (isNewer && !isSignificantlyLessAccurate) {
-	        return true;
-	    }
-	    return false;
+		// Determine location quality using a combination of timeliness and
+		// accuracy
+		if (isMoreAccurate) {
+			return true;
+		} else if (isNewer && !isLessAccurate) {
+			return true;
+		} else if (isNewer && !isSignificantlyLessAccurate) {
+			return true;
+		}
+		return false;
 	}
 
 }

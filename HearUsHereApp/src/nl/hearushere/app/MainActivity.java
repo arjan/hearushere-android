@@ -95,6 +95,8 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		mAPI = new API(mSpiceManager);
 
+		findViewById(R.id.fl_walk_info).setVisibility(View.GONE);
+
 		mIsUniversal = getResources().getBoolean(R.bool.is_universal);
 		showLoader(true);
 		mAPI.getWalks(new RequestListener<Walk.List>() {
@@ -131,7 +133,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 		if (mLastMapWalk == walk) {
 			return;
 		}
-		mLastMapWalk = walk;
+		mLastMapWalk = walk; 
 
 		mMap = getMapFragment().getMap();
 		mMap.setMyLocationEnabled(true);

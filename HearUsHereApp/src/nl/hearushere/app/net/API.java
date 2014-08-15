@@ -34,7 +34,7 @@ public class API {
 								Constants.HEARUSHERE_BASE_URL + "walks.json", null);
 						return mMapper.treeToValue(node, Walk.List.class);
 					}
-		}, "walks", 10 * DurationInMillis.ONE_MINUTE, listener);
+		}, "walks", 10 * DurationInMillis.ONE_WEEK, listener);
 	}
 
 	public void getSoundCloudUserTracks(final String userId,
