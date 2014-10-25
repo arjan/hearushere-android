@@ -1,6 +1,2 @@
-HearUsHereApp/bin
-HearUsHereApp/gen
-HearUsHereApp/local.properties
-libs/*/bin
-libs/*/gen
-
+nlhearushereapp/build
+local.properties
