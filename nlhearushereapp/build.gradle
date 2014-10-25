@@ -1,22 +1,40 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    productFlavors {
+        universal {
+            applicationId "nl.hearushere.app"
+        }
+
+        extrapool {
+            applicationId "nl.hearushere.app.extrapool"
+        }
+    }
+
+    signingConfigs {
+        release {
+            keyAlias 'hearushere'
+            keyPassword 'huh2014'
+            storeFile file('release.keystore')
+            storePassword 'huh2014'
+        }
+    }
+
     compileSdkVersion 19
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        applicationId "nl.hearushere.app"
         minSdkVersion 14
         targetSdkVersion 19
     }
-
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
         }
     }
-
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'

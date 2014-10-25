@@ -2,41 +2,11 @@
 <pre-dex-items>
 
     <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/universal-image-loader-1.9.3-db41142f59094b4617273f4f40046f8b4ebeabbd.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.nostra13.universalimageloader/universal-image-loader/1.9.3/a85588bec3e2c4584d593d3f15df1677321bca72/universal-image-loader-1.9.3.jar"
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/jackson-core-2.4.3-5c93becc33b81bb38cd0437f77951610d7fcd6f4.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.4.3/4cb3dbb0c2f75b51aa7543c53252989785a0c609/jackson-core-2.4.3.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="a85588bec3e2c4584d593d3f15df1677321bca72"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/robospice-cache-1.4.14-dee1941afc1be6492f2ba407885880e7f940cd54.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.octo.android.robospice/robospice-cache/1.4.14/1a13bea0b3ae105c44cb6be7fc76b6d36098faf5/robospice-cache-1.4.14.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="1a13bea0b3ae105c44cb6be7fc76b6d36098faf5"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/jackson-databind-2.4.3-5faac65ede41717726bc74024383d504e8ec5969.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.4.3/feff63199be7b8f495c2f3e2096dcb6bd5e5b0b3/jackson-databind-2.4.3.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="feff63199be7b8f495c2f3e2096dcb6bd5e5b0b3"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/commons-lang3-3.3.2-b6e8763533d4ff130af0f4432caa609ffd0c6ba2.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.3.2/90a3822c38ec8c996e84c16a3477ef632cbc87a3/commons-lang3-3.3.2.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="90a3822c38ec8c996e84c16a3477ef632cbc87a3"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/support-annotations-21.0.0-3c980f4cdf1d9959c68155a5e32110ebb30b1597.jar"
-        jar="/home/arjan/android/extras/android/m2repository/com/android/support/support-annotations/21.0.0/support-annotations-21.0.0.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="1a578b9607b36266c63d43a4fa0ab5664dbe911e"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/spring-android-core-1.0.1.RELEASE-8e011525a645549b855441152a961f33a8627429.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/org.springframework.android/spring-android-core/1.0.1.RELEASE/e68f0e8e4b636ee30c4de58953be38d9b72a5e3b/spring-android-core-1.0.1.RELEASE.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="e68f0e8e4b636ee30c4de58953be38d9b72a5e3b"/>
+        sha1="4cb3dbb0c2f75b51aa7543c53252989785a0c609"/>
     <item
         dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/jackson-annotations-2.4.3-43145e3dc0b6f3781c6fca19591e69e0d65295b3.jar"
         jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.4.3/a30ec6f59b6d31b2df06fa73925fda2fc7e84486/jackson-annotations-2.4.3.jar"
@@ -44,11 +14,35 @@
         revision="19.1.0"
         sha1="a30ec6f59b6d31b2df06fa73925fda2fc7e84486"/>
     <item
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/commons-lang3-3.3.2-b6e8763533d4ff130af0f4432caa609ffd0c6ba2.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.3.2/90a3822c38ec8c996e84c16a3477ef632cbc87a3/commons-lang3-3.3.2.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="90a3822c38ec8c996e84c16a3477ef632cbc87a3"/>
+    <item
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/spring-android-rest-template-1.0.1.RELEASE-0813eced4793a379a37011347a7ba5942f1567df.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/org.springframework.android/spring-android-rest-template/1.0.1.RELEASE/e132d929bd181941f79b0d63edafb8a86ae6fd33/spring-android-rest-template-1.0.1.RELEASE.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="e132d929bd181941f79b0d63edafb8a86ae6fd33"/>
+    <item
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/robospice-cache-1.4.14-dee1941afc1be6492f2ba407885880e7f940cd54.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.octo.android.robospice/robospice-cache/1.4.14/1a13bea0b3ae105c44cb6be7fc76b6d36098faf5/robospice-cache-1.4.14.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="1a13bea0b3ae105c44cb6be7fc76b6d36098faf5"/>
+    <item
         dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/commons-io-1.3.2-fdb5d4e145c08504a20b9dd1f44cbee844ccfdb2.jar"
         jar="/home/arjan/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-io/1.3.2/b6dde38349ba9bb5e6ea6320531eae969985dae5/commons-io-1.3.2.jar"
         jumboMode="false"
         revision="19.1.0"
         sha1="b6dde38349ba9bb5e6ea6320531eae969985dae5"/>
+    <item
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/spring-android-core-1.0.1.RELEASE-8e011525a645549b855441152a961f33a8627429.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/org.springframework.android/spring-android-core/1.0.1.RELEASE/e68f0e8e4b636ee30c4de58953be38d9b72a5e3b/spring-android-core-1.0.1.RELEASE.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="e68f0e8e4b636ee30c4de58953be38d9b72a5e3b"/>
     <item
         dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/robospice-1.4.14-03edcade6220a0545acbd260d134cdcfd5b88a16.jar"
         jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.octo.android.robospice/robospice/1.4.14/fffe1563473feb2f956608554d3e97ad805914a7/robospice-1.4.14.jar"
@@ -56,17 +50,29 @@
         revision="19.1.0"
         sha1="fffe1563473feb2f956608554d3e97ad805914a7"/>
     <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/classes-a9034f834ce6771a78fd8ee4f0d873f7928a3ca2.jar"
-        jar="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/classes.jar"
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/robospice-spring-android-1.4.14-bb613fd0694cce507b5b738ec769aeaed6dbbb7b.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.octo.android.robospice/robospice-spring-android/1.4.14/827eeb7878282c149555c3f2d2250bf45023099e/robospice-spring-android-1.4.14.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="686344a780033e4ba22b926cd225f8d4941247e6"/>
+        sha1="827eeb7878282c149555c3f2d2250bf45023099e"/>
     <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/spring-android-rest-template-1.0.1.RELEASE-0813eced4793a379a37011347a7ba5942f1567df.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/org.springframework.android/spring-android-rest-template/1.0.1.RELEASE/e132d929bd181941f79b0d63edafb8a86ae6fd33/spring-android-rest-template-1.0.1.RELEASE.jar"
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/jackson-databind-2.4.3-5faac65ede41717726bc74024383d504e8ec5969.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-databind/2.4.3/feff63199be7b8f495c2f3e2096dcb6bd5e5b0b3/jackson-databind-2.4.3.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="e132d929bd181941f79b0d63edafb8a86ae6fd33"/>
+        sha1="feff63199be7b8f495c2f3e2096dcb6bd5e5b0b3"/>
+    <item
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/support-annotations-21.0.0-3c980f4cdf1d9959c68155a5e32110ebb30b1597.jar"
+        jar="/home/arjan/android/extras/android/m2repository/com/android/support/support-annotations/21.0.0/support-annotations-21.0.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="1a578b9607b36266c63d43a4fa0ab5664dbe911e"/>
+    <item
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/universal-image-loader-1.9.3-db41142f59094b4617273f4f40046f8b4ebeabbd.jar"
+        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.nostra13.universalimageloader/universal-image-loader/1.9.3/a85588bec3e2c4584d593d3f15df1677321bca72/universal-image-loader-1.9.3.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="a85588bec3e2c4584d593d3f15df1677321bca72"/>
     <item
         dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/internal_impl-21.0.0-7350113c9b60da10e1dd10ceb79c492c5556994c.jar"
         jar="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/libs/internal_impl-21.0.0.jar"
@@ -80,28 +86,16 @@
         revision="19.1.0"
         sha1="88e8e18d365173ad04a543d76c157e0b644f0b3f"/>
     <item
+        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/classes-a9034f834ce6771a78fd8ee4f0d873f7928a3ca2.jar"
+        jar="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="686344a780033e4ba22b926cd225f8d4941247e6"/>
+    <item
         dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/classes-f420142365cec345bbedd39d7c3f7aaab3a76513.jar"
         jar="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.1.11/classes.jar"
         jumboMode="false"
         revision="19.1.0"
         sha1="0f700f6802ba1a1f1fa7ac26d5db0666a89d75a6"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/jackson-core-2.4.3-5c93becc33b81bb38cd0437f77951610d7fcd6f4.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.4.3/4cb3dbb0c2f75b51aa7543c53252989785a0c609/jackson-core-2.4.3.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="4cb3dbb0c2f75b51aa7543c53252989785a0c609"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/commons-io-20030203.000550-68d73b077401d88ad4a22d74205b148be85505f3.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/commons-io/commons-io/20030203.000550/506fc1d8e200a9e664d8befb991d407ae551d7fe/commons-io-20030203.000550.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="506fc1d8e200a9e664d8befb991d407ae551d7fe"/>
-    <item
-        dex="/home/arjan/devel/HearUsHere/nlhearushereapp/build/intermediates/pre-dexed/debug/robospice-spring-android-1.4.14-bb613fd0694cce507b5b738ec769aeaed6dbbb7b.jar"
-        jar="/home/arjan/.gradle/caches/modules-2/files-2.1/com.octo.android.robospice/robospice-spring-android/1.4.14/827eeb7878282c149555c3f2d2250bf45023099e/robospice-spring-android-1.4.14.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="827eeb7878282c149555c3f2d2250bf45023099e"/>
 
 </pre-dex-items>
