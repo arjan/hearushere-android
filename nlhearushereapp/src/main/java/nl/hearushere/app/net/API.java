@@ -30,7 +30,8 @@ public class API {
 				Walk.List.class) {
 					@Override
 					public List loadDataFromNetwork() throws Exception {
-						JsonNode node = HttpRequest.doRequest("GET",
+                        System.out.println(" -- GET WALKS --");
+                        JsonNode node = HttpRequest.doRequest("GET",
 								Constants.HEARUSHERE_BASE_URL + "walks.json", null);
 						return mMapper.treeToValue(node, Walk.List.class);
 					}
@@ -44,6 +45,7 @@ public class API {
 
 			@Override
 			public Track.List loadDataFromNetwork() throws Exception {
+                System.out.println(" -- GET soundcloud --");
 				String url = Constants.SOUNDCLOUD_API_BASE_URL + "users/" + userId + "/tracks.json?offset=0&limit=250&client_id=" + Constants.SOUNDCLOUD_CLIENT_ID;
 				System.out.println("URL: " + url);
 				JsonNode node = HttpRequest.doRequest("GET",
@@ -51,7 +53,7 @@ public class API {
 				return mMapper.treeToValue(node, Track.List.class);
 			}
 
-		}, "tracks-" + userId, 10 * DurationInMillis.ONE_MINUTE, requestListener);
+		}, "tracks-" + userId, 10 * DurationInMillis.ONE_WEEK, requestListener);
 	}
 	
 	public void clearCache() {

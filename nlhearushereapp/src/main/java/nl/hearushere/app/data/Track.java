@@ -53,6 +53,10 @@ public class Track {
 		return tagList;
 	}
 
+    public boolean isBackground() {
+        return tagList != null && tagList.equals("background");
+    }
+
 	public void setTagList(String tagList) {
 		this.tagList = tagList;
 	}
@@ -91,6 +95,10 @@ public class Track {
 	}
 
 	public float getCalculatedVolume(int radius) {
+        if (isBackground()) {
+            return 1.0f;
+        }
+
 		if (currentDistance > radius) {
 			return 0f;
 		}

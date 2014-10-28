@@ -265,7 +265,8 @@ public class AudioWalkService extends Service implements LocationListener {
 
 		Log.v(TAG, "LOCATION UPDATE " + location.toString());
 
-		if (!isInsideMapArea(location)) {
+        boolean insideMapArea = isInsideMapArea(location);
+        if (!insideMapArea) {
 			showNotification("You are too far away from the sounds, please move closer.");
 		} else {
 			hideNotification();
@@ -279,22 +280,31 @@ public class AudioWalkService extends Service implements LocationListener {
 			boolean shouldPlay = track.getCurrentDistance() < track.getRadius()
 					&& soundsPlaying < Constants.MAX_SIMULTANEOUS_SOUNDS;
 
-			MediaPlayer mp = track.getMediaPlayer();
+            if (track.isBackground()) {
+                shouldPlay = true;
+                if (!insideMapArea) {
+                    shouldPlay = false;
+                }
+            }
 
 			// if we are in range, we should play this track
 			if (shouldPlay) {
-				float volume = track.getCalculatedVolume(mCurrentWalk
+                System.out.println("should play: " + track.getTitle());
+                float volume = track.getCalculatedVolume(mCurrentWalk
 						.getRadius());
 				mVolumeHandler.fadeToVolume(track, volume, Constants.FADE_TIME);
 
 				soundsPlaying++;
 			} else {
+                MediaPlayer mp = track.getMediaPlayer();
 				if (mp != null) {
 					Log.v(TAG, "stop " + track.getTitle());
 					mVolumeHandler.fadeToVolume(track, 0f, Constants.FADE_TIME);
 				}
 			}
 		}
+
+        System.out.println("Sounds playing: " + soundsPlaying);
 
 	}
 
@@ -346,9 +356,15 @@ public class AudioWalkService extends Service implements LocationListener {
 
 	private List<Track> getDistanceSortedTracks(LatLng position) {
 		List<Track> result = new ArrayList<Track>();
+        Track bg = null;
 		float[] results = new float[3];
 		for (Track track : mTrackList) {
-			LatLng p = track.getLocation();
+            if (track.isBackground()) {
+                bg = track;
+                continue;
+            }
+
+            LatLng p = track.getLocation();
 			if (p == null) {
 				continue;
 			}
@@ -368,7 +384,10 @@ public class AudioWalkService extends Service implements LocationListener {
 			}
 		});
 
-		return result;
+        if (bg != null) {
+            result.add(bg);
+        }
+        return result;
 	}
 
 	@Override
@@ -446,7 +465,10 @@ public class AudioWalkService extends Service implements LocationListener {
 	}
 
 	private class VolumeManager extends Handler {
-		public VolumeManager(Looper looper) {
+
+        public static final float VOLUME_CUTOFF = 0.000001f;
+
+        public VolumeManager(Looper looper) {
 			super(looper);
 		}
 
@@ -459,13 +481,16 @@ public class AudioWalkService extends Service implements LocationListener {
 
 			MediaPlayer mp = track.getMediaPlayer();
 			if (mp == null) {
+                if (v < VOLUME_CUTOFF) {
+                    return;
+                }
 				mp = buildMediaPlayer(track);
 				track.setMediaPlayer(mp);
 				Log.v(TAG, "Start track: " + track.getTitle());
 			}
 			track.setCurrentVolume(v);
 
-			if (v < 0.000001f) {
+			if (v < VOLUME_CUTOFF) {
 				mp = track.getMediaPlayer();
 				mp.stop();
 				mp.reset();

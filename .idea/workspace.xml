@@ -31,33 +31,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="79cd2e96-7729-42e2-9df1-321f2f61b66c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/main/HearUsHereApplication.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/commons_io_1_3_2.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/commons_lang3_3_3_2.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/jackson_annotations_2_4_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/jackson_core_2_4_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/jackson_databind_2_4_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/library_2_4_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/play_services_6_1_11.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/robospice_1_4_14.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/robospice_cache_1_4_14.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/robospice_spring_android_1_4_14.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/spring_android_core_1_0_1_RELEASE.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/spring_android_rest_template_1_0_1_RELEASE.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/support_annotations_21_0_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/support_v4_21_0_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/universal_image_loader_1_9_3.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/AndroidManifest.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/API.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/API.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/AudioWalkService.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/AudioWalkService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/ui/CircleImageView.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/ui/CircleImageView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/Constants.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/Constants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/CreditsActivity.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/CreditsActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/MainActivity.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/MainActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/HttpSpiceService.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/HttpSpiceService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/data/Track.java" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/data/Track.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/src/main/res/values/attrs.xml" afterPath="$PROJECT_DIR$/nlhearushereapp/src/main/res/values/attrs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/build.gradle" afterPath="$PROJECT_DIR$/nlhearushereapp/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" afterPath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlhearushereapp/nlhearushereapp.iml" afterPath="$PROJECT_DIR$/nlhearushereapp/nlhearushereapp.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="HearUsHereApp.iws" />
@@ -86,16 +63,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="228" max-vertical-offset="1292">
               <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="attrs.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/res/values/attrs.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="152" max-vertical-offset="285">
-              <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -141,27 +108,49 @@
       <file leaf-file-name="AudioWalkService.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/AudioWalkService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4031" max-vertical-offset="11286">
-              <caret line="229" column="35" selection-start-line="229" selection-start-column="35" selection-end-line="229" selection-end-column="35" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="4944" max-vertical-offset="11761">
+              <caret line="288" column="0" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#5887#5932#0" expanded="true" />
-                <element signature="e#9150#9322#0" expanded="true" />
-                <element signature="e#9317#9318#0" expanded="true" />
+                <element signature="e#9693#9865#0" expanded="true" />
+                <element signature="e#9860#9861#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Track.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="API.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/API.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.83179724" vertical-offset="456" max-vertical-offset="1045">
+              <caret line="55" column="61" selection-start-line="55" selection-start-column="61" selection-end-line="55" selection-end-column="61" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HttpSpiceService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/HttpSpiceService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="142" max-vertical-offset="608">
+              <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Track.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/data/Track.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33179724" vertical-offset="1053" max-vertical-offset="2736">
-              <caret line="75" column="16" selection-start-line="75" selection-start-column="16" selection-end-line="75" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1509" max-vertical-offset="2888">
+              <caret line="106" column="48" selection-start-line="106" selection-start-column="48" selection-end-line="106" selection-end-column="48" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3506#3507#0" expanded="true" />
-                <element signature="e#3531#3532#0" expanded="true" />
+                <element signature="e#1236#1237#0" expanded="true" />
+                <element signature="e#1306#1307#0" expanded="true" />
+                <element signature="e#3679#3680#0" expanded="true" />
+                <element signature="e#3704#3705#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -180,18 +169,8 @@
       <file leaf-file-name="Constants.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/Constants.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="76" max-vertical-offset="494">
-              <caret line="4" column="57" selection-start-line="4" selection-start-column="57" selection-end-line="4" selection-end-column="57" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CircleImageView.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/ui/CircleImageView.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1197" max-vertical-offset="4579">
-              <caret line="63" column="61" selection-start-line="63" selection-start-column="61" selection-end-line="63" selection-end-column="61" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="494">
+              <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -1395,7 +1374,6 @@
       <list>
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/nlhearushereapp/src/main/res/layout/main.xml" />
-        <option value="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/HttpSpiceService.java" />
         <option value="$PROJECT_DIR$/nlhearushereapp/src/main/res/values/app_config.xml" />
         <option value="$PROJECT_DIR$/nlhearushereapp/src/main/res/layout/view_item_walk.xml" />
         <option value="$PROJECT_DIR$/nlhearushereapp/src/main/res/layout/credits.xml" />
@@ -1410,7 +1388,9 @@
         <option value="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/MainActivity.java" />
         <option value="$PROJECT_DIR$/nlhearushereapp/build.gradle" />
         <option value="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/data/Track.java" />
+        <option value="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/HttpSpiceService.java" />
         <option value="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/AudioWalkService.java" />
+        <option value="$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/API.java" />
       </list>
     </option>
   </component>
@@ -1740,7 +1720,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="1177" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -1756,7 +1736,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32818532" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32929292" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.5415058" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.5415058" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20864461" sideWeight="0.7705263" order="0" side_tool="false" content_ui="combo" />
@@ -1853,8 +1833,8 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#5887#5932#0" expanded="true" />
-            <element signature="e#9150#9322#0" expanded="true" />
-            <element signature="e#9317#9318#0" expanded="true" />
+            <element signature="e#9693#9865#0" expanded="true" />
+            <element signature="e#9860#9861#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1955,8 +1935,8 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#5887#5932#0" expanded="true" />
-            <element signature="e#9150#9322#0" expanded="true" />
-            <element signature="e#9317#9318#0" expanded="true" />
+            <element signature="e#9693#9865#0" expanded="true" />
+            <element signature="e#9860#9861#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1993,14 +1973,6 @@
       </provider>
       <provider editor-type-id="android-designer">
         <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/HttpSpiceService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="798">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/res/layout/view_item_walk.xml">
@@ -2045,14 +2017,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="285">
           <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/Constants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="494">
-          <caret line="4" column="57" selection-start-line="4" selection-start-column="57" selection-end-line="4" selection-end-column="57" />
           <folding />
         </state>
       </provider>
@@ -2112,28 +2076,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/AudioWalkService.java">
+    <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/Constants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="4031" max-vertical-offset="11286">
-          <caret line="229" column="35" selection-start-line="229" selection-start-column="35" selection-end-line="229" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#5887#5932#0" expanded="true" />
-            <element signature="e#9150#9322#0" expanded="true" />
-            <element signature="e#9317#9318#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="494">
+          <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/data/Track.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33179724" vertical-offset="1053" max-vertical-offset="2736">
-          <caret line="75" column="16" selection-start-line="75" selection-start-column="16" selection-end-line="75" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1509" max-vertical-offset="2888">
+          <caret line="106" column="48" selection-start-line="106" selection-start-column="48" selection-end-line="106" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3506#3507#0" expanded="true" />
-            <element signature="e#3531#3532#0" expanded="true" />
+            <element signature="e#1236#1237#0" expanded="true" />
+            <element signature="e#1306#1307#0" expanded="true" />
+            <element signature="e#3679#3680#0" expanded="true" />
+            <element signature="e#3704#3705#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/HttpSpiceService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="142" max-vertical-offset="608">
+          <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/AudioWalkService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="4944" max-vertical-offset="11761">
+          <caret line="288" column="0" selection-start-line="288" selection-start-column="0" selection-end-line="288" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#5887#5932#0" expanded="true" />
+            <element signature="e#9693#9865#0" expanded="true" />
+            <element signature="e#9860#9861#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlhearushereapp/src/main/java/nl/hearushere/app/net/API.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.83179724" vertical-offset="456" max-vertical-offset="1045">
+          <caret line="55" column="61" selection-start-line="55" selection-start-column="61" selection-end-line="55" selection-end-column="61" />
+          <folding />
         </state>
       </provider>
     </entry>
