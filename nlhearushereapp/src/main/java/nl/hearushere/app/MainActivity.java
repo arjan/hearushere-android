@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import nl.hearushere.app.extrapool.R;
 import nl.hearushere.app.AudioWalkService.AudioEventListener;
 import nl.hearushere.app.AudioWalkService.LocalBinder;
 import nl.hearushere.app.data.Walk;
+import nl.hearushere.app.main.R;
 import nl.hearushere.app.net.API;
 import nl.hearushere.app.net.HttpSpiceService;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -121,7 +123,12 @@ public class MainActivity extends Activity implements AudioEventListener,
 		});
 	}
 
-	@Override
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(new CalligraphyContextWrapper(newBase));
+    }
+
+    @Override
 	public void showLoader(boolean b) {
 		mProgress.setVisibility(b ? View.VISIBLE : View.GONE);
 	}
@@ -377,7 +384,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 	}
 
 	protected void openWalkCredits(Walk walk) {
-		if (walk.getCredits() == null) {
+		if (walk == null || walk.getCredits() == null) {
 			return;
 		}
 		Intent intent = new Intent(this, CreditsActivity.class);

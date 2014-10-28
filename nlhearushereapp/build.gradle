@@ -6,7 +6,6 @@ android {
         universal {
             applicationId "nl.hearushere.app"
         }
-
         extrapool {
             applicationId "nl.hearushere.app.extrapool"
         }
@@ -21,13 +20,15 @@ android {
         }
     }
 
-    compileSdkVersion 19
+    compileSdkVersion 16
     buildToolsVersion "19.1.0"
 
     defaultConfig {
+        applicationId "nl.hearushere.app.main"
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 16
     }
+
     buildTypes {
         release {
             runProguard false
@@ -57,4 +58,5 @@ dependencies {
     compile 'com.octo.android.robospice:robospice:1.4.14'
     compile 'com.android.support:support-v4:21.0.0'
     compile 'com.octo.android.robospice:robospice-spring-android:1.4.14'
+    compile 'uk.co.chrisjenx:calligraphy:1.2.0'
 }

@@ -1,6 +1,5 @@
 package nl.hearushere.app.ui;
 
-import nl.hearushere.app.extrapool.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -16,6 +15,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+
+import nl.hearushere.app.main.R;
 
 public class CircleImageView extends ImageView {
 

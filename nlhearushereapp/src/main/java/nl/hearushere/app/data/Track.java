@@ -161,7 +161,6 @@ public class Track {
 	}
 
 	public double getRadius() {
-		System.out.println("radius: " + this.radius);
 		return this.radius;
 	}
 }

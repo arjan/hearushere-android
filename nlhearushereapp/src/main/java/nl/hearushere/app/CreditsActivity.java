@@ -1,8 +1,11 @@
 package nl.hearushere.app;
 
-import nl.hearushere.app.extrapool.R;
 import nl.hearushere.app.data.Walk;
+import nl.hearushere.app.main.R;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -55,8 +58,13 @@ public class CreditsActivity extends Activity {
 		
 		mWebView.loadUrl(Constants.HEARUSHERE_BASE_URL + mWalk.getCredits());
 	}
-	
-	@Override
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(new CalligraphyContextWrapper(newBase));
+    }
+
+    @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == android.R.id.home) {
 			finish();
