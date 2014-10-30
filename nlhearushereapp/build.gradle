@@ -59,4 +59,5 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.0'
     compile 'com.octo.android.robospice:robospice-spring-android:1.4.14'
     compile 'uk.co.chrisjenx:calligraphy:1.2.0'
+    compile files('libs/estimote-sdk-preview.jar')
 }

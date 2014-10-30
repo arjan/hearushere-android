@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import nl.hearushere.app.bluetooth.BeaconScannerService;
 import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
 import nl.hearushere.app.main.R;
@@ -397,6 +398,8 @@ public class AudioWalkService extends Service implements LocationListener {
 			Notification notification = buildServiceNotification();
 			startForeground(INTENT_ONGOING_ID, notification);
 
+            startService(new Intent(this, BeaconScannerService.class));
+
 			mStarted = true;
 		}
 
@@ -430,7 +433,10 @@ public class AudioWalkService extends Service implements LocationListener {
 	@Override
 	public void onDestroy() {
 		mHandlerThread.quit();
-		super.onDestroy();
+
+        stopService(new Intent(this, BeaconScannerService.class));
+
+        super.onDestroy();
 	}
 
 	@Override

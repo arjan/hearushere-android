@@ -1,6 +1,9 @@
 package nl.hearushere.app.data;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import nl.hearushere.app.Utils;
@@ -62,7 +65,12 @@ public class Track {
 	}
 
 	public String getStreamUrl() {
-		return streamUrl;
+        try {
+            return "http://148.251.184.40:8888/?mp3=" + URLEncoder.encode(streamUrl, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return streamUrl;
+        }
 	}
 
 	public void setStreamUrl(String streamUrl) {

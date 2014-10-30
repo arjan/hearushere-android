@@ -1,17 +1,5 @@
 package nl.hearushere.app;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import nl.hearushere.app.AudioWalkService.AudioEventListener;
-import nl.hearushere.app.AudioWalkService.LocalBinder;
-import nl.hearushere.app.data.Walk;
-import nl.hearushere.app.main.R;
-import nl.hearushere.app.net.API;
-import nl.hearushere.app.net.HttpSpiceService;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -54,6 +42,18 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.viewpagerindicator.PageIndicator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import nl.hearushere.app.AudioWalkService.AudioEventListener;
+import nl.hearushere.app.AudioWalkService.LocalBinder;
+import nl.hearushere.app.data.Walk;
+import nl.hearushere.app.main.R;
+import nl.hearushere.app.net.API;
+import nl.hearushere.app.net.HttpSpiceService;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends Activity implements AudioEventListener,
 		OnMapClickListener {
@@ -450,4 +450,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 		}
 
 	}
+
+
 }

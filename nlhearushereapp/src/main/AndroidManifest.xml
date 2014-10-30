@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nl.hearushere.app.main"
-    android:versionCode="14"
-    android:versionName="1.4" >
+    android:versionCode="15"
+    android:versionName="1.5" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <uses-feature
@@ -26,6 +28,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="nl.hearushere.app.MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
             <intent-filter>
@@ -35,6 +38,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name="nl.hearushere.app.CreditsActivity"
             android:label="@string/app_credits" >
         </activity>
@@ -45,6 +49,12 @@
         <service
             android:name="nl.hearushere.app.net.HttpSpiceService"
             android:exported="false" />
+        <service
+            android:name="nl.hearushere.app.bluetooth.BeaconScannerService"
+            android:exported="false" />
+        <service
+            android:name="com.estimote.sdk.service.BeaconService"
+            android:exported="false" />
 
         <!-- play services -->
         <meta-data
@@ -53,6 +63,8 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCR0M3Pw4YK7w3De5sBD65i8stFeYXmCyo" />
+
+
     </application>
 
 </manifest>

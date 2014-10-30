@@ -23,9 +23,10 @@
             
             <com.viewpagerindicator.CirclePageIndicator
                 android:id="@+id/vp_indicator"
-                app:fillColor="#ffffff"
+                app:fillColor="@color/main_bg"
                 app:pageColor="#333333"
                 app:radius="5dp"
+                android:padding="5dp"
                 app:strokeWidth="0dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
