@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import nl.hearushere.app.bluetooth.BeaconScannerService;
 import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
 import nl.hearushere.app.main.R;
@@ -36,6 +35,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -398,8 +398,6 @@ public class AudioWalkService extends Service implements LocationListener {
 			Notification notification = buildServiceNotification();
 			startForeground(INTENT_ONGOING_ID, notification);
 
-            startService(new Intent(this, BeaconScannerService.class));
-
 			mStarted = true;
 		}
 
@@ -417,7 +415,7 @@ public class AudioWalkService extends Service implements LocationListener {
 		PendingIntent p = PendingIntent.getActivity(this, INTENT_ACTIVITY_ID,
 				startIntent, 0);
 
-		Notification notification = new Notification.Builder(this)
+		Notification notification = new NotificationCompat.Builder(this)
 				.setOngoing(true)
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentIntent(p)
@@ -433,8 +431,6 @@ public class AudioWalkService extends Service implements LocationListener {
 	@Override
 	public void onDestroy() {
 		mHandlerThread.quit();
-
-        stopService(new Intent(this, BeaconScannerService.class));
 
         super.onDestroy();
 	}
