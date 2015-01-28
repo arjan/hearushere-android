@@ -23,7 +23,6 @@ public class HttpSpiceService extends SpiceService {
 		CacheManager cacheManager = new CacheManager();
 
 		List<Class<?>> cacheableClasses = new ArrayList<Class<?>>();
-		cacheableClasses.add(Track.List.class);
 		cacheableClasses.add(Track.class);
 		cacheableClasses.add(Walk.List.class);
 		cacheableClasses.add(Walk.class);

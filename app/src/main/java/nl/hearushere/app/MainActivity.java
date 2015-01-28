@@ -92,9 +92,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 		mLocationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 
-		Constants.SOUNDCLOUD_CLIENT_ID = getResources().getString(
-				R.string.area_soundcloud_client_id);
-
 		mAPI = new API(mSpiceManager);
 
 		findViewById(R.id.fl_walk_info).setVisibility(View.GONE);
@@ -115,8 +112,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 				if (mIsUniversal) {
 					mWalks = walks;
 				} else {
-					mWalks = Arrays.asList(walks
-							.findBySoundcloudUser(getString(R.string.soundcloud_user)));
+					mWalks = Arrays.asList(walks.findById(getString(R.string.fixed_walk_id)));
 				}
 				initPager();
 			}
@@ -154,23 +150,26 @@ public class MainActivity extends Activity implements AudioEventListener,
 			@Override
 			public void onMapLoaded() {
 
-				Builder builder = new LatLngBounds.Builder();
+                ArrayList<ArrayList<LatLng>> pointsList = walk.getPoints();
 
-				ArrayList<LatLng> points = walk.getPoints();
-				for (LatLng point : points) {
-					builder.include(point);
-				}
-				final LatLngBounds bounds = builder.build();
+                Builder builder = new LatLngBounds.Builder();
 
-				mMap.addPolygon(new PolygonOptions()
-						.addAll(points)
-						.strokeColor(
-								getResources().getColor(R.color.polygon_stroke))
-						.strokeWidth(8f)
-						.fillColor(
-								getResources().getColor(R.color.polygon_fill)));
+                // draw polygons on map
+                for (ArrayList<LatLng> points : pointsList) {
+                    for (LatLng point : points) {
+                        builder.include(point);
+                    }
 
-				mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80));
+                    mMap.addPolygon(new PolygonOptions()
+                            .addAll(points)
+                            .strokeColor(
+                                    getResources().getColor(R.color.polygon_stroke))
+                            .strokeWidth(8f)
+                            .fillColor(
+                                    getResources().getColor(R.color.polygon_fill)));
+                }
+
+				mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 80));
 			}
 		});
 	}
@@ -340,7 +339,6 @@ public class MainActivity extends Activity implements AudioEventListener,
 			// In debug mode, log the status
 			// Log.d("Location Updates", "Google Play services is available.");
 			// Continue
-			return;
 			// Google Play services was not available for some reason
 		} else {
 			new AlertDialog.Builder(MainActivity.this)
@@ -419,9 +417,11 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 			Log.v(TAG, walk.getTitle());
 
-			ImageLoader.getInstance().displayImage(
-					Constants.HEARUSHERE_BASE_URL + walk.getImage(),
-					(ImageView) root.findViewById(R.id.iv_item_logo));
+            if (walk.getImageUrl() != null) {
+                ImageLoader.getInstance().displayImage(
+                        walk.getImageUrl(),
+                        (ImageView) root.findViewById(R.id.iv_item_logo));
+            }
 
 			root.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -436,7 +436,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		@Override
 		public boolean isViewFromObject(View arg0, Object arg1) {
-			return arg0 == ((View) arg1);
+			return arg0 == arg1;
 		}
 
 		@Override

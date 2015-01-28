@@ -10,6 +10,6 @@
     <color name="polygon_stroke">#000000</color>
     <color name="polygon_fill">#33ffff00</color>
     
-    <string name="soundcloud_user">extrapoolapp</string>
+    <string name="fixed_walk_id"></string>
 
 </resources>

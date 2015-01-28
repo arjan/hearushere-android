@@ -1,18 +1,18 @@
 package nl.hearushere.app;
 
+import nl.hearushere.app.main.BuildConfig;
+
 public class Constants {
 
-	public static final boolean USE_DEBUG_LOCATION = false;
+	public static final boolean USE_DEBUG_LOCATION = BuildConfig.DEBUG;
 	
-	public static final String SOUNDCLOUD_API_BASE_URL = "http://api.soundcloud.com/";
-	public static final String HEARUSHERE_BASE_URL = "http://www.hearushere.nl/";
+	public static final String API_URL_PREFIX = "http://api.hearushere.nl/";
 	
 	public static final String CACHE_DIR = "hearushere";
-	
-	public static int MAX_SIMULTANEOUS_SOUNDS = 10;
+    public static final String CONTENT_URL_PREFIX = "http://hearushere.nl/walks/";
 
-	public static String SOUNDCLOUD_CLIENT_ID;
-	
+    public static int MAX_SIMULTANEOUS_SOUNDS = 10;
+
 	public static int FADE_STEP = 100; // ms per fade step
 	public static int FADE_TIME = 3000; // ms per fade step
 	

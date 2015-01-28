@@ -31,32 +31,34 @@ public class CreditsActivity extends Activity {
 		mWalk = Utils.deserialize(getIntent().getStringExtra("credits"), Walk.class);
 		
 		getActionBar().setTitle(mWalk.getTitle());
-		
-		ImageLoader.getInstance().loadImage(Constants.HEARUSHERE_BASE_URL + mWalk.getImage(), new ImageLoadingListener() {
-			
-			@Override
-			public void onLoadingStarted(String arg0, View arg1) {
-			}
-			
-			@Override
-			public void onLoadingFailed(String arg0, View arg1, FailReason arg2) {
-			}
-			
-			@Override
-			public void onLoadingComplete(String arg0, View arg1, Bitmap arg2) {
-				getActionBar().setIcon(new BitmapDrawable(getResources(), arg2));
-			}
-			
-			@Override
-			public void onLoadingCancelled(String arg0, View arg1) {
-			}
-		});
-		
+
+        if (mWalk.getImageUrl() != null) {
+            ImageLoader.getInstance().loadImage(mWalk.getImageUrl(), new ImageLoadingListener() {
+
+                @Override
+                public void onLoadingStarted(String arg0, View arg1) {
+                }
+
+                @Override
+                public void onLoadingFailed(String arg0, View arg1, FailReason arg2) {
+                }
+
+                @Override
+                public void onLoadingComplete(String arg0, View arg1, Bitmap arg2) {
+                    getActionBar().setIcon(new BitmapDrawable(getResources(), arg2));
+                }
+
+                @Override
+                public void onLoadingCancelled(String arg0, View arg1) {
+                }
+            });
+        }
+
 		getActionBar().setHomeButtonEnabled(true);
 
 		mWebView = (WebView)findViewById(R.id.wv_credits);
 		
-		mWebView.loadUrl(Constants.HEARUSHERE_BASE_URL + mWalk.getCredits());
+		mWebView.loadUrl(mWalk.getCreditsUrl());
 	}
 
     @Override

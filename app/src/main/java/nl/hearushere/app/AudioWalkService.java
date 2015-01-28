@@ -1,22 +1,5 @@
 package nl.hearushere.app;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import nl.hearushere.app.data.Track;
-import nl.hearushere.app.data.Walk;
-import nl.hearushere.app.main.R;
-import nl.hearushere.app.net.API;
-import nl.hearushere.app.net.HttpSpiceService;
-
-import org.apache.commons.io.FileUtils;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -40,8 +23,23 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.octo.android.robospice.SpiceManager;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.request.listener.RequestListener;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import nl.hearushere.app.data.Track;
+import nl.hearushere.app.data.Walk;
+import nl.hearushere.app.main.R;
+import nl.hearushere.app.net.API;
+import nl.hearushere.app.net.HttpSpiceService;
 
 public class AudioWalkService extends Service implements LocationListener {
 
@@ -67,7 +65,7 @@ public class AudioWalkService extends Service implements LocationListener {
 	protected Handler mHandler;
 	private HandlerThread mHandlerThread;
 	private Handler mUIHandler;
-	private Track.List mTrackList;
+	private List<Track> mTrackList;
 	private boolean mSoundsLoaded;
 
 	private boolean mStarted;
@@ -107,48 +105,14 @@ public class AudioWalkService extends Service implements LocationListener {
 				stopPlayback();
 			}
 			mCurrentWalk = walk;
-			mTrackList = null;
 
 			Log.v(TAG, "sync? "
 					+ (mCurrentWalk.areTracksSynchronized() ? "Yes" : "no"));
 
 			updateServiceNotification();
 
-			if (mAudioEventListener != null) {
-				mAudioEventListener.showLoader(true);
-			}
-
-			mAPI.getSoundCloudUserTracks(walk.getScUser(),
-					new RequestListener<Track.List>() {
-						@Override
-						public void onRequestSuccess(Track.List list) {
-							if (mAudioEventListener != null) {
-								mAudioEventListener.showLoader(false);
-							}
-
-							for (Track t : list) {
-								t.determineLocationAndRadius(walk.getRadius());
-							}
-
-							// if (Constants.USE_DEBUG_LOCATION) {
-							// for (Track track : arg0) {
-							// mMap.addMarker(new MarkerOptions()
-							// .position(track.getLocation())
-							// .alpha(0.5f).title(track.getTitle()));
-							// }
-							// }
-							mTrackList = list;
-							loadTracks();
-						}
-
-						@Override
-						public void onRequestFailure(SpiceException arg0) {
-							if (mAudioEventListener != null) {
-								mAudioEventListener.showNetworkErrorMessage();
-							}
-						}
-					});
-
+            mTrackList = mCurrentWalk.getSounds();
+            loadTracks();
 		}
 
 		public Walk getCurrentWalk() {
@@ -224,7 +188,8 @@ public class AudioWalkService extends Service implements LocationListener {
 
 			@Override
 			public void run() {
-				for (int i = 0; mTrackList != null && i < mTrackList.size(); i++) {
+                System.out.println("Loading tracks " + mTrackList.size());
+                for (int i = 0; mTrackList != null && i < mTrackList.size(); i++) {
 					Track track = mTrackList.get(i);
 
 					final File cacheFile = track
@@ -290,7 +255,7 @@ public class AudioWalkService extends Service implements LocationListener {
 
 			// if we are in range, we should play this track
 			if (shouldPlay) {
-                System.out.println("should play: " + track.getTitle());
+                System.out.println("should play: " + track.getFile());
                 float volume = track.getCalculatedVolume(mCurrentWalk
 						.getRadius());
 				mVolumeHandler.fadeToVolume(track, volume, Constants.FADE_TIME);
@@ -299,7 +264,7 @@ public class AudioWalkService extends Service implements LocationListener {
 			} else {
                 MediaPlayer mp = track.getMediaPlayer();
 				if (mp != null) {
-					Log.v(TAG, "stop " + track.getTitle());
+					Log.v(TAG, "stop " + track.getFile());
 					mVolumeHandler.fadeToVolume(track, 0f, Constants.FADE_TIME);
 				}
 			}
@@ -310,49 +275,52 @@ public class AudioWalkService extends Service implements LocationListener {
 	}
 
 	private boolean isInsideMapArea(LatLng location) {
-		ArrayList<LatLng> polyLoc = mCurrentWalk.getPoints();
 
 		if (location == null)
 			return false;
-		
-		LatLng lastPoint = polyLoc.get(polyLoc.size() - 1);
-		boolean isInside = false;
-		double x = location.longitude;
+        ArrayList<ArrayList<LatLng>> polyLocs = mCurrentWalk.getPoints();
 
-		for (LatLng point : polyLoc) {
-			double x1 = lastPoint.longitude;
-			double x2 = point.longitude;
-			double dx = x2 - x1;
+        for (ArrayList<LatLng> polyLoc : polyLocs) {
+            LatLng lastPoint = polyLoc.get(polyLoc.size() - 1);
+            boolean isInside = false;
+            double x = location.longitude;
 
-			if (Math.abs(dx) > 180.0) {
-				// we have, most likely, just jumped the dateline (could do
-				// further validation to this effect if needed). normalise the
-				// numbers.
-				if (x > 0) {
-					while (x1 < 0)
-						x1 += 360;
-					while (x2 < 0)
-						x2 += 360;
-				} else {
-					while (x1 > 0)
-						x1 -= 360;
-					while (x2 > 0)
-						x2 -= 360;
-				}
-				dx = x2 - x1;
-			}
+            for (LatLng point : polyLoc) {
+                double x1 = lastPoint.longitude;
+                double x2 = point.longitude;
+                double dx = x2 - x1;
 
-			if ((x1 <= x && x2 > x) || (x1 >= x && x2 < x)) {
-				double grad = (point.latitude - lastPoint.latitude) / dx;
-				double intersectAtLat = lastPoint.latitude + ((x - x1) * grad);
+                if (Math.abs(dx) > 180.0) {
+                    // we have, most likely, just jumped the dateline (could do
+                    // further validation to this effect if needed). normalise the
+                    // numbers.
+                    if (x > 0) {
+                        while (x1 < 0)
+                            x1 += 360;
+                        while (x2 < 0)
+                            x2 += 360;
+                    } else {
+                        while (x1 > 0)
+                            x1 -= 360;
+                        while (x2 > 0)
+                            x2 -= 360;
+                    }
+                    dx = x2 - x1;
+                }
 
-				if (intersectAtLat > location.latitude)
-					isInside = !isInside;
-			}
-			lastPoint = point;
-		}
+                if ((x1 <= x && x2 > x) || (x1 >= x && x2 < x)) {
+                    double grad = (point.latitude - lastPoint.latitude) / dx;
+                    double intersectAtLat = lastPoint.latitude + ((x - x1) * grad);
 
-		return isInside;
+                    if (intersectAtLat > location.latitude)
+                        isInside = !isInside;
+                }
+                lastPoint = point;
+            }
+
+            if (isInside) return true;
+        }
+        return false;
 	}
 
 	private List<Track> getDistanceSortedTracks(LatLng position) {
@@ -365,7 +333,7 @@ public class AudioWalkService extends Service implements LocationListener {
                 continue;
             }
 
-            LatLng p = track.getLocation();
+            LatLng p = track.getLocationLatLng();
 			if (p == null) {
 				continue;
 			}
@@ -488,7 +456,7 @@ public class AudioWalkService extends Service implements LocationListener {
                 }
 				mp = buildMediaPlayer(track);
 				track.setMediaPlayer(mp);
-				Log.v(TAG, "Start track: " + track.getTitle());
+				Log.v(TAG, "Start track: " + track.getStreamUrl());
 			}
 			track.setCurrentVolume(v);
 
@@ -498,7 +466,7 @@ public class AudioWalkService extends Service implements LocationListener {
 				mp.reset();
 				mp.release();
 				track.setMediaPlayer(null);
-				Log.v(TAG, "Stop track: " + track.getTitle());
+				Log.v(TAG, "Stop track: " + track.getStreamUrl());
 			}
 		}
 

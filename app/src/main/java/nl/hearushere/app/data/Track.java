@@ -1,12 +1,5 @@
 package nl.hearushere.app.data;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-
-import nl.hearushere.app.Utils;
 import android.content.Context;
 import android.media.MediaPlayer;
 
@@ -16,82 +9,60 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.File;
+
+import nl.hearushere.app.Constants;
+
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
 public class Track {
 
-	public static class List extends ArrayList<Track> {
+    @JsonProperty
+    private boolean bluetooth;
 
-		private static final long serialVersionUID = 1L;
+    @JsonProperty
+    private boolean background;
 
-	}
+    @JsonProperty
+    private String file;
 
 	@JsonProperty
-	private int id;
+	private double[] location;
 
 	@JsonProperty
-	private String title;
-
-	@JsonProperty("tag_list")
-	private String tagList;
-
-	@JsonProperty("stream_url")
-	private String streamUrl;
-
-	@JsonIgnore
-	private LatLng location;
-
-	@JsonIgnore
 	private int radius;
 
-	@JsonIgnore
-	private MediaPlayer mediaPlayer;
+    @JsonProperty
+    private String uuid;
+
+    @JsonProperty
+    private String major;
+
+    @JsonProperty
+    private String minor;
 
 	@JsonIgnore
-	private float currentVolume;
+	transient private MediaPlayer mediaPlayer;
 
 	@JsonIgnore
-	private double currentDistance;
+    transient private float currentVolume;
 
-	public String getTagList() {
-		return tagList;
-	}
-
-    public boolean isBackground() {
-        return tagList != null && tagList.equals("background");
-    }
-
-	public void setTagList(String tagList) {
-		this.tagList = tagList;
-	}
+	@JsonIgnore
+    transient private double currentDistance;
 
 	public String getStreamUrl() {
-        try {
-            return "http://148.251.184.40:8888/?mp3=" + URLEncoder.encode(streamUrl, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return streamUrl;
-        }
-	}
-
-	public void setStreamUrl(String streamUrl) {
-		this.streamUrl = streamUrl;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+        return Constants.CONTENT_URL_PREFIX + file;
 	}
 
 	public File getCacheFile(Context context) {
-		return new File(context.getCacheDir(), Utils.stringHash(streamUrl)
+		return new File(context.getCacheDir(), getId()
 				+ ".mp3");
 	}
 
-	public LatLng getLocation() {
-		return location;
+	public LatLng getLocationLatLng() {
+        if (location == null) {
+            return null;
+        }
+        return new LatLng(location[0], location[1]);
 	}
 
 	public double getCurrentDistance() {
@@ -102,11 +73,14 @@ public class Track {
 		this.currentDistance = currentDistance;
 	}
 
-	public float getCalculatedVolume(int radius) {
+	public float getCalculatedVolume(int defaultRadius) {
         if (isBackground()) {
             return 1.0f;
         }
-
+        double radius = this.radius;
+        if (radius <= 0.0) {
+            radius = defaultRadius;
+        }
 		if (currentDistance > radius) {
 			return 0f;
 		}
@@ -123,14 +97,6 @@ public class Track {
 		this.mediaPlayer = mediaPlayer;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public float getCurrentVolume() {
 		return currentVolume;
 	}
@@ -141,42 +107,34 @@ public class Track {
 			try {
 				mediaPlayer.setVolume(currentVolume, currentVolume);
 			} catch (IllegalStateException e) {
+                e.printStackTrace();
 			}
 		}
-	}
-
-	public void determineLocationAndRadius(int defaultRadius) {
-		double lat = 0.0, lng = 0.0;
-		int radius = 0;
-		boolean hasLat = false, hasLng = false, hasRadius = false;
-
-		// geo:lat=52.374351 geo:lon=4.852556 radius=444
-
-		String[] parts = tagList.split(" ");
-		for (String part : parts) {
-			try {
-				if (part.startsWith("geo:lat")) {
-					lat = Double.parseDouble(part.split("=")[1]);
-					hasLat = true;
-				}
-				else if (part.startsWith("geo:lon")) {
-					lng = Double.parseDouble(part.split("=")[1]);
-					hasLng = true;
-				}
-				else if (part.contains("radius")) {
-					radius = Integer.parseInt(part.split("=")[1]);
-					hasRadius = true;
-				}
-			} catch (Exception e) {
-			}
-		}
-		if (hasLat && hasLng) {
-			location = new LatLng(lat, lng);
-		}
-		this.radius = hasRadius ? radius : defaultRadius;
 	}
 
 	public double getRadius() {
 		return this.radius;
 	}
+
+    public boolean isBluetooth() {
+        return bluetooth;
+    }
+
+    public boolean isBackground() {
+        return background;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public double[] getLocation() {
+        return location;
+    }
+
+    public int getId() {
+        return getStreamUrl().hashCode();
+    }
+
+
 }
