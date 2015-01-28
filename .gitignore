@@ -1,2 +1,5 @@
-nlhearushereapp/build
+/app/build
+/build
+.idea
+*.iml
 local.properties
