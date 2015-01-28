@@ -136,5 +136,15 @@ public class Track {
         return getStreamUrl().hashCode();
     }
 
+    public String getUuid() {
+        return uuid;
+    }
 
+    public String getMajor() {
+        return major;
+    }
+
+    public String getMinor() {
+        return minor;
+    }
 }

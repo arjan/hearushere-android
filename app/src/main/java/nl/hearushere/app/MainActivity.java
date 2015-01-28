@@ -229,8 +229,10 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 		Walk current = mServiceInterface.getCurrentWalk();
 		if (current == null || !walk.getTitle().equals(current.getTitle())) {
+            getActionBar().setTitle(walk.getTitle());
 			mButton.setText("START");
 		} else {
+            getActionBar().setTitle(getString(R.string.app_name));
 			mButton.setText("STOP");
 		}
 	}
@@ -239,16 +241,18 @@ public class MainActivity extends Activity implements AudioEventListener,
 		Walk walk = mWalks.get(mViewPager.getCurrentItem());
 		Walk current = mServiceInterface.getCurrentWalk();
 		if (current == null || !walk.getTitle().equals(current.getTitle())) {
-			getActionBar().setTitle(walk.getTitle());
 			mServiceInterface.startPlayback(walk);
 		} else {
-			getActionBar().setTitle(getString(R.string.app_name));
 			mServiceInterface.stopPlayback();
 		}
-		walkSelected(mViewPager.getCurrentItem());
 	}
 
-	@Override
+    @Override
+    public void uiUpdate() {
+        walkSelected(mViewPager.getCurrentItem());
+    }
+
+    @Override
 	protected void onStart() {
 		super.onStart();
 		mSpiceManager.start(this);

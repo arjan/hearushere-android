@@ -1,26 +1,38 @@
 package nl.hearushere.app;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
+import com.estimote.sdk.Beacon;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
 import com.google.android.gms.maps.model.LatLng;
 import com.octo.android.robospice.SpiceManager;
 
@@ -33,7 +45,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
@@ -41,47 +55,63 @@ import nl.hearushere.app.main.R;
 import nl.hearushere.app.net.API;
 import nl.hearushere.app.net.HttpSpiceService;
 
-public class AudioWalkService extends Service implements LocationListener {
+public class AudioWalkService extends Service implements LocationListener, BeaconManager.ServiceReadyCallback, BeaconManager.MonitoringListener {
 
-	public interface AudioEventListener {
-		public void showNotification(String message);
+    private static final String ACTION_STOP = "ACTION_STOP";
+    private static final String ACTION_START = "ACTION_START";
 
+    private MediaSessionManager mManager;
+    private MediaSession mSession;
+    private Object mController;
+    private BeaconManager mBeaconManager;
+    private HashMap<String, Track> mBluetoothTrackMap;
+    private LatLng mLastLocation;
+
+    public interface AudioEventListener {
+
+
+
+        public void showNotification(String message);
 		public void hideNotification();
 
 		public void showNetworkErrorMessage();
 
 		public void showLoader(boolean flag);
 
+        public void uiUpdate();
+
 	}
 
 	public static final String TAG = AudioWalkService.class.getSimpleName();
 
-	private static int INTENT_ONGOING_ID = 1001;
-	private static int INTENT_ACTIVITY_ID = 1002;
-	private static final int LOCATION_TIME_DELTA = 1000 * 30;
+	private static int NOTIFICATION_ID = 1001;
 
+    private static int INTENT_ACTIVITY_ID = 1002;
+    private static final int LOCATION_TIME_DELTA = 1000 * 30;
 	public AudioEventListener mAudioEventListener;
-	private LocalBinder mBinder = new LocalBinder();
-	protected Handler mHandler;
-	private HandlerThread mHandlerThread;
-	private Handler mUIHandler;
-	private List<Track> mTrackList;
-	private boolean mSoundsLoaded;
 
+    private LocalBinder mBinder = new LocalBinder();
+    protected Handler mHandler;
+    private HandlerThread mHandlerThread;
+    private Handler mUIHandler;
+    private List<Track> mTrackList;
+    private Map<String, Track> mCurrentBluetoothSounds;
+    private boolean mSoundsLoaded;
 	private boolean mStarted;
 
 	private Walk mCurrentWalk;
 
+    private Walk mLastWalk;
 	private VolumeManager mVolumeHandler;
 
 	public int mTotalDuration = -1;
-	private long mSoundStartTime;
 
+    private long mSoundStartTime;
 	public class LocalBinder extends Binder {
-		public void setAudioEventListener(AudioEventListener listener) {
+
+        public void setAudioEventListener(AudioEventListener listener) {
 			mAudioEventListener = listener;
 		}
-
 		public void stopService() {
 
 			mLocationManager.removeUpdates(AudioWalkService.this);
@@ -101,56 +131,27 @@ public class AudioWalkService extends Service implements LocationListener {
 		}
 
 		public void startPlayback(final Walk walk) {
-			if (mCurrentWalk != null) {
-				stopPlayback();
-			}
-			mCurrentWalk = walk;
-
-			Log.v(TAG, "sync? "
-					+ (mCurrentWalk.areTracksSynchronized() ? "Yes" : "no"));
-
-			updateServiceNotification();
-
-            mTrackList = mCurrentWalk.getSounds();
-            loadTracks();
+            AudioWalkService.this.startPlayback(walk);
 		}
 
-		public Walk getCurrentWalk() {
+        public Walk getCurrentWalk() {
 			return mCurrentWalk;
 		}
 
 		public void stopPlayback() {
-			mAudioEventListener.showLoader(false);
-			hideNotification();
-
-			if (mTrackList != null) {
-				for (Track track : mTrackList) {
-					mVolumeHandler.removeMessages(track.getId());
-					MediaPlayer mp = track.getMediaPlayer();
-					if (mp != null) {
-						mp.stop();
-						mp.reset();
-						mp.release();
-					}
-				}
-			}
-			mCurrentWalk = null;
-			updateServiceNotification();
-
-			mSoundsLoaded = false;
-			mTrackList = null;
+            AudioWalkService.this.stopPlayback();
 		}
 
 		public void setDebugLocation(final LatLng location) {
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					playLocationSounds(location);
+					onLocationUpdate(location);
 				}
 			});
 		}
-	}
 
+    }
 	protected SpiceManager mSpiceManager = new SpiceManager(
 			HttpSpiceService.class);
 
@@ -158,7 +159,7 @@ public class AudioWalkService extends Service implements LocationListener {
 
 	private LocationManager mLocationManager;
 
-	private Location mLastLocation;
+	private Location mLastSensedLocation;
 
 	@Override
 	public void onCreate() {
@@ -181,9 +182,50 @@ public class AudioWalkService extends Service implements LocationListener {
 
 		mAPI = new API(mSpiceManager);
 		mSpiceManager.start(this);
-	}
+    }
 
-	public void loadTracks() {
+    private void startPlayback(Walk walk) {
+        if (mCurrentWalk != null) {
+            stopPlayback();
+        }
+        mCurrentWalk = walk;
+
+        Log.v(TAG, "sync? "
+                + (mCurrentWalk.areTracksSynchronized() ? "Yes" : "no"));
+
+        updateServiceNotification();
+
+        mTrackList = mCurrentWalk.getSounds();
+        loadTracks();
+
+        if (mAudioEventListener != null) {
+            mAudioEventListener.uiUpdate();
+        }
+
+        if (hasBluetoothSupport() && mCurrentWalk.hasBluetooth()) {
+            startBluetoothScan();
+        }
+    }
+
+
+
+    private boolean hasBluetoothSupport() {
+        return Build.VERSION.SDK_INT >= 18 && getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void startBluetoothScan() {
+        mBeaconManager = new BeaconManager(this);
+        mBeaconManager.connect(this);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void stopBluetoothScan() {
+        System.out.println("stop cscan");
+        mBeaconManager.disconnect();
+    }
+
+    public void loadTracks() {
 		mHandler.post(new Runnable() {
 
 			@Override
@@ -192,13 +234,15 @@ public class AudioWalkService extends Service implements LocationListener {
                 for (int i = 0; mTrackList != null && i < mTrackList.size(); i++) {
 					Track track = mTrackList.get(i);
 
-					final File cacheFile = track
-							.getCacheFile(AudioWalkService.this);
+					String url = track.getStreamUrl();
+                    if (url == null) {
+                        continue;
+                    }
 
-					String url = track.getStreamUrl() + "?client_id="
-							+ getString(R.string.area_soundcloud_client_id);
+                    final File cacheFile = track
+                            .getCacheFile(AudioWalkService.this);
 
-					if (!cacheFile.exists()) {
+                    if (!cacheFile.exists()) {
 						showNotification(String.format(
 								getString(R.string.load_progress), i + 1,
 								mTrackList.size()));
@@ -224,33 +268,81 @@ public class AudioWalkService extends Service implements LocationListener {
 		});
 	}
 
-	private void playLocationSounds(LatLng location) {
-		if (mTrackList == null) {
-			return;
-		}
+    private void stopPlayback() {
+        mAudioEventListener.showLoader(false);
+        hideNotification();
 
-		Log.v(TAG, "LOCATION UPDATE " + location.toString());
+        if (mTrackList != null) {
+            for (Track track : mTrackList) {
+                mVolumeHandler.removeMessages(track.getId());
+                MediaPlayer mp = track.getMediaPlayer();
+                if (mp != null) {
+                    mp.stop();
+                    mp.reset();
+                    mp.release();
+                }
+            }
+        }
 
-        boolean insideMapArea = isInsideMapArea(location);
+        if (hasBluetoothSupport() && mCurrentWalk.hasBluetooth()) {
+            stopBluetoothScan();
+        }
+
+        mLastWalk = mCurrentWalk;
+        mCurrentWalk = null;
+
+        updateServiceNotification();
+
+        mSoundsLoaded = false;
+        mTrackList = null;
+
+        if (mAudioEventListener != null) {
+            mAudioEventListener.uiUpdate();
+        }
+    }
+
+	private void onLocationUpdate(LatLng location) {
+        if (mTrackList == null) {
+            return;
+        }
+
+        Log.v(TAG, "LOCATION UPDATE " + location.toString());
+
+        mLastLocation = location;
+        playLocationSounds();
+    }
+
+    private void playLocationSounds() {
+		List<Track> sorted = getDistanceSortedTracks(mLastLocation);
+
+        boolean insideMapArea = isInsideMapArea(mLastLocation);
         if (!insideMapArea) {
-			showNotification("You are too far away from the sounds, please move closer.");
-		} else {
-			hideNotification();
-		}
-		List<Track> sorted = getDistanceSortedTracks(location);
+            showNotification("You are too far away from the sounds, please move closer.");
+        } else {
+            hideNotification();
+        }
 
-		// loop through all sounds
+        // loop through all sounds
 		int soundsPlaying = 0;
 		for (Track track : sorted) {
+            if (track.getFile() == null) {
+                continue; // invalid file
+            }
 
 			boolean shouldPlay = track.getCurrentDistance() < track.getRadius()
-					&& soundsPlaying < Constants.MAX_SIMULTANEOUS_SOUNDS;
+					&& soundsPlaying < Constants.MAX_SIMULTANEOUS_SOUNDS
+                    && !track.isBackground()
+                    && !track.isBluetooth();
 
             if (track.isBackground()) {
                 shouldPlay = true;
                 if (!insideMapArea) {
                     shouldPlay = false;
                 }
+            }
+            if (track.isBluetooth() && mCurrentBluetoothSounds.containsValue(track)) {
+                System.out.println("PLAY BT!!!");
+                shouldPlay = true;
             }
 
 			// if we are in range, we should play this track
@@ -325,16 +417,15 @@ public class AudioWalkService extends Service implements LocationListener {
 
 	private List<Track> getDistanceSortedTracks(LatLng position) {
 		List<Track> result = new ArrayList<Track>();
-        Track bg = null;
+
 		float[] results = new float[3];
 		for (Track track : mTrackList) {
-            if (track.isBackground()) {
-                bg = track;
+            if (track.isBackground() || track.isBluetooth()) {
                 continue;
             }
 
             LatLng p = track.getLocationLatLng();
-			if (p == null) {
+			if (p == null || track.getStreamUrl() == null) {
 				continue;
 			}
 
@@ -353,9 +444,13 @@ public class AudioWalkService extends Service implements LocationListener {
 			}
 		});
 
-        if (bg != null) {
-            result.add(bg);
+        // add all bluetooth and background tracks
+        for (Track track : mTrackList) {
+            if (track.isBackground() || track.isBluetooth()) {
+                result.add(track);
+            }
         }
+
         return result;
 	}
 
@@ -363,40 +458,127 @@ public class AudioWalkService extends Service implements LocationListener {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
 		if (!mStarted) {
+            if (Build.VERSION.SDK_INT >= 21) {
+                initMediaSession();
+            }
 			Notification notification = buildServiceNotification();
-			startForeground(INTENT_ONGOING_ID, notification);
+			startForeground(NOTIFICATION_ID, notification);
 
 			mStarted = true;
 		}
 
+        if (ACTION_START.equals(intent.getAction())) {
+            startPlayback(mLastWalk);
+        }
+        if (ACTION_STOP.equals(intent.getAction())) {
+            stopPlayback();
+        }
+
+
 		return START_STICKY;
 	}
 
-	private void updateServiceNotification() {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void initMediaSession() {
+        mManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+        mSession = new MediaSession(getApplicationContext(), "sample session");
+        mController = new MediaController(getApplicationContext(), mSession.getSessionToken());
+        mSession.setActive(true);
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mSession.setCallback(new MediaSession.Callback() {
+            @Override
+            public void onPlay() {
+                super.onPlay();
+                System.out.println("play");
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+                System.out.println("pause");
+            }
+        });
+    }
+
+    private void updateServiceNotification() {
 		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-				.notify(INTENT_ONGOING_ID, buildServiceNotification());
+				.notify(NOTIFICATION_ID, buildServiceNotification());
 	}
 
-	private Notification buildServiceNotification() {
+    private Notification buildServiceNotification() {
 		Intent startIntent = new Intent(this, MainActivity.class);
 		startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 		PendingIntent p = PendingIntent.getActivity(this, INTENT_ACTIVITY_ID,
 				startIntent, 0);
 
-		Notification notification = new NotificationCompat.Builder(this)
-				.setOngoing(true)
-				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentIntent(p)
-				.setContentTitle(
-						mCurrentWalk == null ? getString(R.string.app_name)
-								: mCurrentWalk.getTitle())
-				.setContentText(
-						getString(mCurrentWalk == null ? R.string.notification_not_started_text
-								: R.string.notification_progress_text)).build();
-		return notification;
-	}
+        if (Build.VERSION.SDK_INT < 21) {
+            return buildNotificationPreLollipop(p);
+        }
 
-	@Override
+        return buildMediaNotification(p);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private Notification buildMediaNotification(PendingIntent p) {
+        Notification.Builder builder = new Notification.Builder(this)
+                .setOngoing(true)
+                .setSmallIcon(R.drawable.ic_stat_huh)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
+                .setContentIntent(p)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setContentTitle(
+                        mCurrentWalk == null ? getString(R.string.app_name)
+                                : mCurrentWalk.getTitle())
+                .setContentText(
+                        getString(mCurrentWalk == null ? R.string.notification_not_started_text
+                                : R.string.notification_progress_text_small));
+
+        boolean hasAction = false;
+        if (mCurrentWalk != null) {
+            builder.setTicker(getString(R.string.notification_progress_text_small));
+            builder.addAction(generateAction(android.R.drawable.ic_media_pause, "Stop", ACTION_STOP));
+            hasAction = true;
+        } else {
+            if (mLastWalk != null) {
+                builder.addAction(generateAction(android.R.drawable.ic_media_play, "Start", ACTION_START));
+                hasAction = true;
+            }
+        }
+        if (hasAction) {
+            builder.setStyle(new Notification.MediaStyle()
+                    .setShowActionsInCompactView(0 /* #1: pause button */)
+                    .setMediaSession(mSession.getSessionToken()));
+        }
+
+        return builder.build();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private Notification.Action generateAction( int icon, String title, String intentAction ) {
+        Intent intent = new Intent( getApplicationContext(), AudioWalkService.class );
+        intent.setAction( intentAction );
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        return new Notification.Action.Builder( icon, title, pendingIntent ).build();
+    }
+
+    private Notification buildNotificationPreLollipop(PendingIntent p) {
+        Notification notification = new NotificationCompat.Builder(this)
+                .setOngoing(true)
+                .setSmallIcon(R.drawable.ic_stat_huh)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
+                .setContentIntent(p)
+                .setTicker(getString(R.string.notification_progress_text_small))
+                .setContentTitle(
+                        mCurrentWalk == null ? getString(R.string.app_name)
+                                : mCurrentWalk.getTitle())
+                .setContentText(
+                        getString(mCurrentWalk == null ? R.string.notification_not_started_text
+                                : R.string.notification_progress_text)).build();
+        return notification;
+    }
+
+
+    @Override
 	public void onDestroy() {
 		mHandlerThread.quit();
 
@@ -408,7 +590,18 @@ public class AudioWalkService extends Service implements LocationListener {
 		return mBinder;
 	}
 
-	private void showNotification(final String msg) {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public boolean onUnbind(Intent intent) {
+
+        if (mSession != null) {
+            mSession.release();
+        }
+
+        return super.onUnbind(intent);
+    }
+
+    private void showNotification(final String msg) {
 		if (mAudioEventListener == null) {
 			return;
 		}
@@ -516,8 +709,8 @@ public class AudioWalkService extends Service implements LocationListener {
 			m.obj = track;
 			sendMessageDelayed(m, time);
 		}
-	}
 
+    }
 	@Override
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
@@ -543,16 +736,16 @@ public class AudioWalkService extends Service implements LocationListener {
 			return;
 		}
 
-		if (!isBetterLocation(location, mLastLocation)) {
+		if (!isBetterLocation(location, mLastSensedLocation)) {
 			return;
 		}
-		mLastLocation = location;
+		mLastSensedLocation = location;
 
 		Runnable playLocationSounds = new Runnable() {
 			@Override
 			public void run() {
-				playLocationSounds(new LatLng(location.getLatitude(),
-						location.getLongitude()));
+				onLocationUpdate(new LatLng(location.getLatitude(),
+                        location.getLongitude()));
 			}
 		};
 		mHandler.removeCallbacks(playLocationSounds);
@@ -562,7 +755,7 @@ public class AudioWalkService extends Service implements LocationListener {
 	/**
 	 * Determines whether one Location reading is better than the current
 	 * Location fix
-	 * 
+	 *
 	 * @param location
 	 *            The new Location that you want to evaluate
 	 * @param currentBestLocation
@@ -611,5 +804,53 @@ public class AudioWalkService extends Service implements LocationListener {
 		}
 		return false;
 	}
+
+    @Override
+    public void onServiceReady() {
+
+        System.out.println("-- ready for beacon service --");
+        mBeaconManager.setBackgroundScanPeriod(5 * 1000, 15 * 1000);
+
+        try {
+            mBeaconManager.setMonitoringListener(this);
+
+            mCurrentBluetoothSounds = new HashMap<>();
+            mBluetoothTrackMap = new HashMap<>();
+
+            for (Track t : mCurrentWalk.getBluetoothTracks()) {
+                Region region = convertTrackToRegion(t);
+                if (region != null) {
+                    mBeaconManager.startMonitoring(region);
+                    mBluetoothTrackMap.put(""+t.getId(), t);
+                }
+            }
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private Region convertTrackToRegion(Track t) {
+        if (t.getUuid() == null || t.getMajor() == null || t.getMinor() == null) {
+            return null;
+        }
+        return new Region("" + t.getId(), t.getUuid(), Integer.parseInt(t.getMajor()), Integer.parseInt(t.getMinor()));
+    }
+
+    @Override
+    public void onEnteredRegion(Region region, List<Beacon> beacons) {
+        Track bluetoothTrack = mBluetoothTrackMap.get(region.getIdentifier());
+        mCurrentBluetoothSounds.put(region.getIdentifier(), bluetoothTrack);
+        System.out.println("Play bluetooth sound!");
+        playLocationSounds();
+    }
+
+    @Override
+    public void onExitedRegion(Region region) {
+        System.out.println("Gone..!!!" + region);
+        mCurrentBluetoothSounds.remove(region.getIdentifier());
+        playLocationSounds();
+    }
 
 }

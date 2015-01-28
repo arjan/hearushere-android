@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
 import nl.hearushere.app.Constants;
 
@@ -147,11 +150,11 @@ public class Walk {
                     }
                     minLat = Math.min(minLat, area[i]);
                     maxLat = Math.max(maxLat, area[i]);
-                    minLng = Math.min(minLng, area[i+1]);
+                    minLng = Math.min(minLng, area[i + 1]);
                     maxLng = Math.max(maxLng, area[i + 1]);
                 }
             }
-            mCenter = new LatLng((maxLat-minLat)/2, (maxLng-minLng)/2);
+            mCenter = new LatLng((maxLat - minLat) / 2, (maxLng - minLng) / 2);
         }
         return mCenter;
     }
@@ -171,4 +174,22 @@ public class Walk {
     public java.util.List<Track> getSounds() {
         return sounds;
     }
+
+    public boolean hasBluetooth() {
+        for (Track s : sounds) {
+            if (s.isBluetooth()) return true;
+        }
+        return false;
+    }
+
+    public java.util.List<Track> getBluetoothTracks() {
+        java.util.List<Track> r = new ArrayList<>();
+        for (Track s : sounds) {
+            if (s.isBluetooth()) {
+                r.add(s);
+            }
+        }
+        return r;
+    }
+
 }
