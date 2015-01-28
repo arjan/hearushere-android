@@ -24,7 +24,6 @@ android {
     buildToolsVersion "19.1.0"
 
     defaultConfig {
-        applicationId "nl.hearushere.app.main"
         minSdkVersion 14
         targetSdkVersion 21
     }
@@ -42,6 +41,18 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+
+    // Customize generated apk's name with version number
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                def fileName = outputFile.name.replace('.apk', "-${versionName}.apk")
+                output.outputFile = new File(outputFile.parent, fileName)
+            }
+        }
+    }
+    
 }
 
 dependencies {
