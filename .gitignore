@@ -1,6 +1,7 @@
-HearUsHereApp/bin
-HearUsHereApp/gen
-HearUsHereApp/local.properties
-libs/*/bin
-libs/*/gen
+/app/build
+/build
+.idea
+*.iml
+.gradle
 
+local.properties

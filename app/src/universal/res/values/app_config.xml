@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">HearUsHere</string>
+    <bool name="is_universal">true</bool>
+    
+    <color name="main_fg">#000000</color>
+    <color name="main_bg">#FCEE23</color>
+
+    <color name="polygon_stroke">#000000</color>
+    <color name="polygon_fill">#33ffff00</color>
+    
+    <string name="soundcloud_user">extrapoolapp</string>
+
+</resources>
