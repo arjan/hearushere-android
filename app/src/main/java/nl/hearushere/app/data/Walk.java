@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
@@ -63,6 +65,8 @@ public class Walk {
     private java.util.List<Track> sounds;
 
     private transient LatLng mCenter;
+    private transient double currentDistance = - 1;
+
 
     public ArrayList<ArrayList<LatLng>> getPoints() {
         ArrayList<ArrayList<LatLng>> result = new ArrayList<>();
@@ -114,27 +118,19 @@ public class Walk {
         this.tracksSynchronized = tracksSynchronized;
     }
 
-    public String getFormattedDistanceTo(Location current) {
+    public String getFormattedDistance() {
 
-        if (current == null) {
+        if (currentDistance < 0) {
             return "";
         }
-
-        LatLng center = getCenter();
-
-        float[] results = new float[3];
-        Location.distanceBetween(center.latitude, center.longitude,
-                current.getLatitude(), current.getLongitude(), results);
-        double distance = results[0];
-
-        if (distance > 1000) {
-            return String.format("%.2f km", distance / 1000);
+        if (currentDistance > 1000) {
+            return String.format("%.2f km", currentDistance / 1000);
         } else {
-            return String.format("%.0f m", distance);
+            return String.format("%.0f m", currentDistance);
         }
     }
 
-    private LatLng getCenter() {
+    public LatLng getCenter() {
         if (mCenter == null) {
             double minLat = 0, minLng = 0, maxLat = 0, maxLng = 0;
             boolean first = true;
@@ -154,7 +150,9 @@ public class Walk {
                     maxLng = Math.max(maxLng, area[i + 1]);
                 }
             }
-            mCenter = new LatLng((maxLat - minLat) / 2, (maxLng - minLng) / 2);
+            mCenter = new LatLng((maxLat + minLat) / 2, (maxLng + minLng) / 2);
+
+            System.out.println("-- Center " + mCenter.latitude + " " + mCenter.longitude);
         }
         return mCenter;
     }
@@ -192,4 +190,11 @@ public class Walk {
         return r;
     }
 
+    public double getCurrentDistance() {
+        return currentDistance;
+    }
+
+    public void setCurrentDistance(double currentDistance) {
+        this.currentDistance = currentDistance;
+    }
 }

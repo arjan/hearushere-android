@@ -8,6 +8,9 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -45,10 +48,13 @@ import com.viewpagerindicator.PageIndicator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import nl.hearushere.app.AudioWalkService.AudioEventListener;
 import nl.hearushere.app.AudioWalkService.LocalBinder;
+import nl.hearushere.app.data.Track;
 import nl.hearushere.app.data.Walk;
 import nl.hearushere.app.main.R;
 import nl.hearushere.app.net.API;
@@ -109,15 +115,57 @@ public class MainActivity extends Activity implements AudioEventListener,
 			@Override
 			public void onRequestSuccess(Walk.List walks) {
 				showLoader(false);
-				if (mIsUniversal) {
-					mWalks = walks;
-				} else {
-					mWalks = Arrays.asList(walks.findById(getString(R.string.fixed_walk_id)));
-				}
-				initPager();
+
+                if (mIsUniversal) {
+                    mWalks = walks;
+                } else {
+                    mWalks = Arrays.asList(walks.findById(getString(R.string.fixed_walk_id)));
+                }
+                waitForLocation();
 			}
 		});
 	}
+
+    private void waitForLocation() {
+        Location loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (loc != null) {
+            initPager(loc);
+        } else {
+
+            Criteria criteria = new Criteria();
+            criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
+            criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+            criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
+            criteria.setBearingAccuracy(Criteria.ACCURACY_LOW);
+            criteria.setSpeedAccuracy(Criteria.ACCURACY_MEDIUM);
+
+            showNotification("Waiting on GPS signal.");
+
+            mLocationManager.requestSingleUpdate(criteria, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    hideNotification();
+                    initPager(location);
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+            }, null);
+
+        }
+    }
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -185,9 +233,13 @@ public class MainActivity extends Activity implements AudioEventListener,
 		checkServicesConnected();
 	}
 
-	protected void initPager() {
+	protected void initPager(Location loc) {
 
-		View container = findViewById(R.id.fl_walk_info);
+        System.out.println("-- init pager--");
+        System.out.println("-- " + loc.getLatitude() + " " + loc.getLongitude());
+        sortWalksByClosestDistance(new LatLng(loc.getLatitude(), loc.getLongitude()));
+
+        View container = findViewById(R.id.fl_walk_info);
 		mViewPager = (ViewPager) findViewById(R.id.vp_walks);
 
 		if (mWalks.size() == 1) {
@@ -295,7 +347,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 				mServiceInterface.setAudioEventListener(MainActivity.this);
 
 				if (mWalks != null && mViewPager == null) {
-					initPager();
+					waitForLocation();
 				}
 			}
 
@@ -416,8 +468,7 @@ public class MainActivity extends Activity implements AudioEventListener,
 					.getTitle());
 
 			((TextView) root.findViewById(R.id.tv_item_distance))
-					.setText(walk.getFormattedDistanceTo(mLocationManager
-							.getLastKnownLocation(LocationManager.GPS_PROVIDER)));
+					.setText(walk.getFormattedDistance());
 
 			Log.v(TAG, walk.getTitle());
 
@@ -455,5 +506,24 @@ public class MainActivity extends Activity implements AudioEventListener,
 
 	}
 
+    public void sortWalksByClosestDistance(final LatLng loc) {
+        float[] results = new float[3];
+
+        for (Walk walks: mWalks) {
+            LatLng c = walks.getCenter();
+            Location.distanceBetween(loc.latitude, loc.longitude,
+                    c.latitude, c.longitude, results);
+            double distance = results[0];
+            walks.setCurrentDistance(distance);
+        }
+
+        Collections.sort(mWalks, new Comparator<Walk>() {
+            @Override
+            public int compare(Walk lhs, Walk rhs) {
+                return (int) (lhs.getCurrentDistance() - rhs
+                        .getCurrentDistance());
+            }
+        });
+    }
 
 }

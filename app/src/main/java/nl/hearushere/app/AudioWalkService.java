@@ -16,7 +16,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
-import android.media.session.MediaSessionManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +25,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
@@ -60,7 +60,6 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
     private static final String ACTION_STOP = "ACTION_STOP";
     private static final String ACTION_START = "ACTION_START";
 
-    private MediaSessionManager mManager;
     private MediaSession mSession;
     private Object mController;
     private BeaconManager mBeaconManager;
@@ -88,7 +87,9 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
 
     private static int INTENT_ACTIVITY_ID = 1002;
     private static final int LOCATION_TIME_DELTA = 1000 * 30;
-	public AudioEventListener mAudioEventListener;
+
+    @Nullable
+    public AudioEventListener mAudioEventListener;
 
     private LocalBinder mBinder = new LocalBinder();
     protected Handler mHandler;
@@ -269,7 +270,9 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
 	}
 
     private void stopPlayback() {
-        mAudioEventListener.showLoader(false);
+        if (mAudioEventListener != null) {
+            mAudioEventListener.showLoader(false);
+        }
         hideNotification();
 
         if (mTrackList != null) {
@@ -425,7 +428,7 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
             }
 
             LatLng p = track.getLocationLatLng();
-			if (p == null || track.getStreamUrl() == null) {
+			if (p == null || position == null || track.getStreamUrl() == null) {
 				continue;
 			}
 
@@ -480,7 +483,6 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void initMediaSession() {
-        mManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
         mSession = new MediaSession(getApplicationContext(), "sample session");
         mController = new MediaController(getApplicationContext(), mSession.getSessionToken());
         mSession.setActive(true);
