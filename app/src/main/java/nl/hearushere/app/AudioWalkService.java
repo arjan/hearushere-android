@@ -196,6 +196,11 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
 
         updateServiceNotification();
 
+        Location loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (loc != null) {
+            mLastLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
+        }
+
         mTrackList = mCurrentWalk.getSounds();
         loadTracks();
 
@@ -253,14 +258,18 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
 							FileUtils.copyURLToFile(new URL(url), cacheFile);
 						} catch (IOException e) {
 							e.printStackTrace();
-							break;
+							continue;
 						}
 					}
 				}
 				mSoundStartTime = -1;
 				if (mTrackList != null) {
 					mSoundsLoaded = true;
-					showNotification("Please go to the area located on the map to begin.");
+                    showNotification("Please go to the area located on the map to begin.");
+                    if (mLastLocation != null) {
+                        onLocationUpdate(mLastLocation);
+                    }
+
 				} else {
 					// starting aborted
 					hideNotification();
@@ -343,7 +352,7 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
                     shouldPlay = false;
                 }
             }
-            if (track.isBluetooth() && mCurrentBluetoothSounds.containsValue(track)) {
+            if (track.isBluetooth() && mCurrentBluetoothSounds != null && mCurrentBluetoothSounds.containsValue(track)) {
                 System.out.println("PLAY BT!!!");
                 shouldPlay = true;
             }
@@ -371,8 +380,11 @@ public class AudioWalkService extends Service implements LocationListener, Beaco
 
 	private boolean isInsideMapArea(LatLng location) {
 
-		if (location == null)
-			return false;
+		if (location == null) {
+            System.out.println("- no location..");
+            return false;
+        }
+
         ArrayList<ArrayList<LatLng>> polyLocs = mCurrentWalk.getPoints();
 
         for (ArrayList<LatLng> polyLoc : polyLocs) {

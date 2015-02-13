@@ -26,6 +26,10 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
+
+        versionCode 201
+        versionName "2.1"
+
     }
 
     buildTypes {
