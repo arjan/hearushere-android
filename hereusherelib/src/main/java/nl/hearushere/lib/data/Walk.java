@@ -6,15 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import nl.hearushere.lib.Constants;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
 public class Walk {
 
-    public Walk() {
-    }
+    private java.util.List<ArrayList<LatLng>> mDisplayPoints;
 
     public static class List extends ArrayList<Walk> {
 
@@ -59,10 +57,20 @@ public class Walk {
     private java.util.List<Track> sounds;
 
     private transient LatLng mCenter;
+
     private transient double currentDistance = - 1;
 
+    public Walk() {
+    }
 
-    public ArrayList<ArrayList<LatLng>> getPoints() {
+    public java.util.List<ArrayList<LatLng>> getDisplayPoints() {
+        if (mDisplayPoints != null) {
+            return mDisplayPoints;
+        }
+        return getPoints();
+    }
+
+    public java.util.List<ArrayList<LatLng>> getPoints() {
         ArrayList<ArrayList<LatLng>> result = new ArrayList<>();
         for (double[] area : areas) {
             ArrayList<LatLng> list = new ArrayList<>();
@@ -234,5 +242,9 @@ public class Walk {
 
     public void setmCenter(LatLng mCenter) {
         this.mCenter = mCenter;
+    }
+
+    public void setDisplayPoints(java.util.List<ArrayList<LatLng>> mDisplayPoints) {
+        this.mDisplayPoints = mDisplayPoints;
     }
 }

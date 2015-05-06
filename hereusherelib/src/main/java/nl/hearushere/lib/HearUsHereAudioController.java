@@ -170,7 +170,7 @@ public class HearUsHereAudioController implements BeaconManager.ServiceReadyCall
             return false;
         }
 
-        ArrayList<ArrayList<LatLng>> polyLocs = mWalk.getPoints();
+        List<ArrayList<LatLng>> polyLocs = mWalk.getPoints();
 
         for (ArrayList<LatLng> polyLoc : polyLocs) {
             if (Utils.isInsidePolygon(location, polyLoc)) return true;

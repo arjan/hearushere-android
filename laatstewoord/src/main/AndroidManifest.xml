@@ -24,6 +24,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="nl.miraclethings.laatstewoord.LaatsteWoordService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

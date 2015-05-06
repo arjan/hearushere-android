@@ -9,12 +9,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
+import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import nl.hearushere.lib.Constants;
+import nl.hearushere.lib.Utils;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
-public class Track {
+public class Track implements Serializable {
 
     @JsonProperty
     private boolean bluetooth;
@@ -28,11 +34,11 @@ public class Track {
     @JsonProperty
     private String url;
 
-	@JsonProperty
-	private double[] location;
+    @JsonProperty
+    private double[] location;
 
-	@JsonProperty
-	private int radius;
+    @JsonProperty
+    private int radius;
 
     @JsonProperty
     private String uuid;
@@ -43,40 +49,61 @@ public class Track {
     @JsonProperty
     private String minor;
 
-	@JsonIgnore
-	transient private MediaPlayer mediaPlayer;
+    @JsonIgnore
+    transient private MediaPlayer mediaPlayer;
 
-	@JsonIgnore
+    @JsonIgnore
     transient private float currentVolume;
 
-	@JsonIgnore
+    @JsonIgnore
     transient private double currentDistance;
 
-	public String getStreamUrl() {
-        return url != null ? url : Constants.CONTENT_URL_PREFIX + file;
-	}
+    @JsonIgnore
+    transient private LatLng latlng;
 
-	public File getCacheFile(Context context) {
-		return new File(context.getCacheDir(), getId()
-				+ ".mp3");
-	}
+    @JsonIgnore
+    transient private String overrideUrl;
 
-	public LatLng getLocationLatLng() {
+    public Track() {
+    }
+
+    public Track(String url) {
+        this.url = url;
+        System.out.println("new track: " + url);
+    }
+
+    public String getStreamUrl() {
+        return overrideUrl != null ? overrideUrl : (url != null ? url : Constants.CONTENT_URL_PREFIX + file);
+    }
+
+    public File getCacheFile(Context context) {
+        return new File(context.getCacheDir(), getHash()
+                + ".mp3");
+    }
+
+    private String getHash() {
+        return Utils.sha256(getStreamUrl());
+    }
+
+    public LatLng getLocationLatLng() {
         if (location == null) {
             return null;
         }
-        return new LatLng(location[0], location[1]);
-	}
+        if (latlng == null) {
+            latlng = new LatLng(location[0], location[1]);
+        }
+        return latlng;
+    }
 
-	public double getCurrentDistance() {
-		return currentDistance;
-	}
+    public double getCurrentDistance() {
+        return currentDistance;
+    }
 
-	public void setCurrentDistance(double currentDistance) {
-		this.currentDistance = currentDistance;
-	}
+    public void setCurrentDistance(double currentDistance) {
+        this.currentDistance = currentDistance;
+    }
 
-	public float getCalculatedVolume(int defaultRadius) {
+    public float getCalculatedVolume(int defaultRadius) {
         if (isBackground()) {
             return 1.0f;
         }
@@ -84,40 +111,40 @@ public class Track {
         if (radius <= 0.0) {
             radius = defaultRadius;
         }
-		if (currentDistance > radius) {
-			return 0f;
-		}
-		// Magic (c) James Bryan Graves :)
-		return (float) Math.max(0.0,
-				Math.min(1.0, Math.log(currentDistance / radius) * -0.5));
-	}
+        if (currentDistance > radius) {
+            return 0f;
+        }
+        // Magic (c) James Bryan Graves :)
+        return (float) Math.max(0.0,
+                Math.min(1.0, Math.log(currentDistance / radius) * -0.5));
+    }
 
-	public MediaPlayer getMediaPlayer() {
-		return mediaPlayer;
-	}
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
 
-	public void setMediaPlayer(MediaPlayer mediaPlayer) {
-		this.mediaPlayer = mediaPlayer;
-	}
+    public void setMediaPlayer(MediaPlayer mediaPlayer) {
+        this.mediaPlayer = mediaPlayer;
+    }
 
-	public float getCurrentVolume() {
-		return currentVolume;
-	}
+    public float getCurrentVolume() {
+        return currentVolume;
+    }
 
-	public void setCurrentVolume(float currentVolume) {
-		this.currentVolume = currentVolume;
-		if (mediaPlayer != null) {
-			try {
-				mediaPlayer.setVolume(currentVolume, currentVolume);
-			} catch (IllegalStateException e) {
+    public void setCurrentVolume(float currentVolume) {
+        this.currentVolume = currentVolume;
+        if (mediaPlayer != null) {
+            try {
+                mediaPlayer.setVolume(currentVolume, currentVolume);
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
-			}
-		}
-	}
+            }
+        }
+    }
 
-	public double getRadius() {
-		return this.radius;
-	}
+    public double getRadius() {
+        return this.radius;
+    }
 
     public boolean isBluetooth() {
         return bluetooth;
@@ -149,5 +176,49 @@ public class Track {
 
     public String getMinor() {
         return minor;
+    }
+
+    public void setBluetooth(boolean bluetooth) {
+        this.bluetooth = bluetooth;
+    }
+
+    public void setBackground(boolean background) {
+        this.background = background;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setLocation(double[] location) {
+        this.location = location;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setMajor(String major) {
+        this.major = major;
+    }
+
+    public void setMinor(String minor) {
+        this.minor = minor;
+    }
+
+    public void setOverrideUrl(String overrideUrl) {
+        this.overrideUrl = overrideUrl;
     }
 }

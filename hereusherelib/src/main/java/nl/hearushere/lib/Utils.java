@@ -1,13 +1,22 @@
 package nl.hearushere.lib;
 
+import android.content.Context;
 import android.location.Location;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Parcelable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+
+import nl.hearushere.lib.data.Triggers;
 
 public class Utils {
 
@@ -135,5 +144,48 @@ public class Utils {
             return true;
         }
         return false;
+    }
+
+    public static String sha256(String base) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(base.getBytes("UTF-8"));
+            StringBuffer hexString = new StringBuffer();
+
+            for (int i = 0; i < hash.length; i++) {
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static double measureGeoDistance(LatLng a, LatLng b) {
+        float[] results = new float[3];
+        Location.distanceBetween(a.latitude, a.longitude,
+                b.latitude, b.longitude, results);
+        return results[0];
+    }
+
+    public static MediaPlayer playSoundOnce(Context context, Triggers.Url url, MediaPlayer.OnCompletionListener onDone) {
+        MediaPlayer player = new MediaPlayer();
+        try {
+            player.setDataSource(context, Uri.fromFile(url.getCacheFile(context)));
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            player.prepare();
+            if (onDone != null) {
+                player.setOnCompletionListener(onDone);
+            }
+            player.setLooping(false);
+            player.setVolume(1.0f, 1.0f);
+            player.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return player;
     }
 }

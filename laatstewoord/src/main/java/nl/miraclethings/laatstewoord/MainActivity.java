@@ -1,32 +1,49 @@
 package nl.miraclethings.laatstewoord;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import nl.hearushere.lib.AudioWalkService;
 import nl.hearushere.lib.Constants;
+import nl.hearushere.lib.data.Track;
 import nl.hearushere.lib.data.Triggers;
-import nl.hearushere.lib.data.Walk;
 import nl.hearushere.lib.net.API;
 import nl.hearushere.lib.net.HttpSpiceService;
 
-public class MainActivity extends Activity implements GoogleMap.OnMapClickListener {
+public class MainActivity extends Activity implements GoogleMap.OnMapClickListener, AudioWalkService.AudioEventListener {
 
+    private static final String TAG = "MainActivity";
     protected SpiceManager mSpiceManager = new SpiceManager(
             HttpSpiceService.class);
 
@@ -36,6 +53,10 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
     private View mProgress;
     private Button mButton;
     private Triggers mTriggers;
+    private ServiceConnection mServiceConnection;
+    private LaatsteWoordService.LocalBinder mServiceInterface;
+    private Marker mDebugMarker;
+    private boolean hasMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +87,10 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
                 System.out.println("size: " + triggers.areas.size());
 
                 mTriggers = triggers;
-                mButton.setVisibility(View.VISIBLE);
                 //Walk walk = triggers.buildWalk();
                 initMap();
+
+                connectAudioService();
             }
         });
     }
@@ -76,9 +98,24 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
     @Override
     protected void onResume() {
         super.onResume();
-//        setUpMapIfNeeded();
+        checkServicesConnected();
     }
 
+    @Override
+    protected void onPause() {
+        if (mServiceConnection != null) {
+            if (mServiceInterface != null) {
+                mServiceInterface.setAudioEventListener(null);
+                if (mServiceInterface.getCurrentWalk() == null) {
+                    mServiceInterface.stopService();
+                }
+            }
+            unbindService(mServiceConnection);
+            mServiceConnection = null;
+        }
+
+        super.onPause();
+    }
 
     @Override
     protected void onStart() {
@@ -92,9 +129,54 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
         super.onStop();
     }
 
+    @Override
+    public void showNotification(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void hideNotification() {
+
+    }
+
+    @Override
+    public void showNetworkErrorMessage() {
+        Toast.makeText(this, "Network error...", Toast.LENGTH_SHORT).show();
+
+    }
+
     public void showLoader(boolean b) {
         mProgress.setVisibility(b ? View.VISIBLE : View.GONE);
     }
+
+    @Override
+    public void uiUpdate() {
+        if (mServiceInterface == null) {
+            mButton.setVisibility(View.GONE);
+            return;
+        }
+
+        System.out.println("UI UPDATE");
+
+        if (!hasMap && mServiceInterface.getTriggers() != null) {
+            hasMap = true;
+        }
+        mMap.clear();
+
+        if (mServiceInterface.getCurrentWalk() != null) {
+            addMapMarkers(mServiceInterface.getCurrentWalk().getSounds());
+        }
+
+        if (mServiceInterface.getTriggers() != null) {
+            addMapTriggers(mServiceInterface.getTriggers());
+        }
+
+        if (mServiceInterface.getLastLocation() != null) {
+            mDebugMarker = mMap.addMarker(new MarkerOptions().position(mServiceInterface.getLastLocation())
+                    .draggable(false));
+        }
+    }
+
 
     private MapFragment getMapFragment() {
         return (MapFragment) getFragmentManager().findFragmentById(R.id.map);
@@ -114,8 +196,6 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
             @Override
             public void onMapLoaded() {
 
-                System.out.println("Hello");
-
                 ArrayList<LatLng> points = mTriggers.getDisplayCoords();
 
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -127,9 +207,7 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
 
                 mMap.addPolygon(new PolygonOptions()
                         .addAll(points)
-                        .strokeColor(
-                                getResources().getColor(R.color.polygon_stroke))
-                        .strokeWidth(8f)
+                        .strokeWidth(0f)
                         .fillColor(
                                 getResources().getColor(R.color.polygon_fill)));
 
@@ -139,7 +217,93 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
     }
 
     @Override
-    public void onMapClick(LatLng latLng) {
+    public void onMapClick(LatLng latlng) {
+        mServiceInterface.setDebugLocation(latlng);
+
+        if (mDebugMarker != null) {
+            mDebugMarker.setPosition(latlng);
+        } else {
+            mDebugMarker = mMap.addMarker(new MarkerOptions().position(mServiceInterface.getLastLocation())
+                    .draggable(false));
+        }
 
     }
+
+    private void checkServicesConnected() {
+        int resultCode = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (ConnectionResult.SUCCESS != resultCode) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setCancelable(false)
+                    .setMessage(
+                            "Sorry, we were unable to connect to the Location Service. Please enable the location in the settings and try again.")
+                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            finish();
+                        }
+                    }).show();
+        }
+    }
+
+    private void connectAudioService() {
+        Intent service = new Intent(this, LaatsteWoordService.class);
+        service.putExtra("triggers", mTriggers);
+        startService(service);
+
+        mServiceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mServiceInterface = (LaatsteWoordService.LocalBinder) service;
+                Log.v(TAG, "Bound to service!");
+                mServiceInterface.setAudioEventListener(MainActivity.this);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mServiceInterface = null;
+                Log.v(TAG, "Disconnected from service!");
+            }
+        };
+
+        bindService(service, mServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private void addMapMarkers(List<Track> sounds) {
+        for (Track sound : sounds) {
+            addTriggerMarker(sound, R.color.black);
+        }
+    }
+
+    private void addTriggerMarker(Track sound, int color) {
+        mMap.addCircle(new CircleOptions()
+                .radius(1f)
+                .center(sound.getLocationLatLng())
+                .strokeColor(getResources().getColor(color))
+                .strokeWidth(6f));
+
+        mMap.addCircle(new CircleOptions()
+                .radius(sound.getRadius())
+                .center(sound.getLocationLatLng())
+                .strokeColor(getResources().getColor(color))
+                .strokeWidth(6f));
+    }
+
+    private void addMapTriggers(Triggers triggers) {
+        for (Triggers.Area area : triggers.areas) {
+            mMap.addPolygon(new PolygonOptions()
+                    .addAll(area.getCoords())
+                    .strokeWidth(4f)
+                    .strokeColor(getResources().getColor(R.color.red)));
+
+            for (Track trigger : area.triggers) {
+                if (trigger.getUrl() != null) {
+                    continue;
+                }
+                addTriggerMarker(trigger, R.color.red);
+            }
+        }
+    }
+
 }

@@ -33,9 +33,9 @@ import nl.hearushere.lib.net.HttpSpiceService;
 
 public abstract class AudioWalkService extends Service implements LocationListener, HearUsHereAudioController.UICallback {
 
-    private LatLng mLastLocation;
+    protected LatLng mLastLocation;
     private HearUsHereAudioController mHearUsHereAudioController;
-    private NotificationController mNotificationController;
+    protected NotificationController mNotificationController;
 
 
     public interface AudioEventListener {
@@ -57,18 +57,19 @@ public abstract class AudioWalkService extends Service implements LocationListen
     protected Handler mHandler;
     private HandlerThread mHandlerThread;
     private Handler mUIHandler;
-    private List<Track> mTrackList;
+    protected List<Track> mTrackList;
     private boolean mSoundsLoaded;
-    private boolean mStarted;
+    protected boolean mStarted;
 
-    private Walk mCurrentWalk;
+    protected Walk mCurrentWalk;
 
-    private Walk mLastWalk;
+    protected Walk mLastWalk;
 
     public class LocalBinder extends Binder {
 
         public void setAudioEventListener(AudioEventListener listener) {
             mAudioEventListener = listener;
+            uiUpdate();
         }
 
         public void stopService() {
@@ -97,8 +98,13 @@ public abstract class AudioWalkService extends Service implements LocationListen
                 @Override
                 public void run() {
                     onLocationUpdate(location);
+                    uiUpdate();
                 }
             });
+        }
+
+        public LatLng getLastLocation() {
+            return mLastLocation;
         }
 
     }
@@ -106,7 +112,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
     protected SpiceManager mSpiceManager = new SpiceManager(
             HttpSpiceService.class);
 
-    private LocationManager mLocationManager;
+    protected LocationManager mLocationManager;
 
     @Override
     public void onCreate() {
@@ -149,9 +155,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
         mTrackList = mCurrentWalk.getSounds();
         loadTracks();
 
-        if (mAudioEventListener != null) {
-            mAudioEventListener.uiUpdate();
-        }
+        uiUpdate();
 
     }
 
@@ -223,12 +227,12 @@ public abstract class AudioWalkService extends Service implements LocationListen
         mSoundsLoaded = false;
         mTrackList = null;
 
-        if (mAudioEventListener != null) {
-            mAudioEventListener.uiUpdate();
-        }
+        uiUpdate();
     }
 
-    private void onLocationUpdate(LatLng location) {
+    protected void onLocationUpdate(LatLng location) {
+        mLastLocation = location;
+
         if (mTrackList == null) {
             return;
         }
@@ -306,6 +310,18 @@ public abstract class AudioWalkService extends Service implements LocationListen
             @Override
             public void run() {
                 mAudioEventListener.hideNotification();
+            }
+        });
+    }
+
+    public void uiUpdate() {
+        if (mAudioEventListener == null) {
+            return;
+        }
+        mUIHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mAudioEventListener.uiUpdate();
             }
         });
     }
