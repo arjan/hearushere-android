@@ -9,12 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.Serializable;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import nl.hearushere.lib.Constants;
 import nl.hearushere.lib.Utils;
@@ -61,9 +57,6 @@ public class Track implements Serializable {
     @JsonIgnore
     transient private LatLng latlng;
 
-    @JsonIgnore
-    transient private String overrideUrl;
-
     public Track() {
     }
 
@@ -73,7 +66,7 @@ public class Track implements Serializable {
     }
 
     public String getStreamUrl() {
-        return overrideUrl != null ? overrideUrl : (url != null ? url : Constants.CONTENT_URL_PREFIX + file);
+        return url != null ? url : Constants.CONTENT_URL_PREFIX + file;
     }
 
     public File getCacheFile(Context context) {
@@ -158,10 +151,6 @@ public class Track implements Serializable {
         return file;
     }
 
-    public double[] getLocation() {
-        return location;
-    }
-
     public int getId() {
         return getStreamUrl().hashCode();
     }
@@ -178,10 +167,6 @@ public class Track implements Serializable {
         return minor;
     }
 
-    public void setBluetooth(boolean bluetooth) {
-        this.bluetooth = bluetooth;
-    }
-
     public void setBackground(boolean background) {
         this.background = background;
     }
@@ -194,31 +179,4 @@ public class Track implements Serializable {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setLocation(double[] location) {
-        this.location = location;
-    }
-
-    public void setRadius(int radius) {
-        this.radius = radius;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setMajor(String major) {
-        this.major = major;
-    }
-
-    public void setMinor(String minor) {
-        this.minor = minor;
-    }
-
-    public void setOverrideUrl(String overrideUrl) {
-        this.overrideUrl = overrideUrl;
-    }
 }

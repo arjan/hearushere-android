@@ -125,7 +125,7 @@ public class HearUsHereAudioController implements BeaconManager.ServiceReadyCall
         // loop through all sounds
         int soundsPlaying = 0;
         for (Track track : sorted) {
-            if (track.getFile() == null) {
+            if (track.getStreamUrl() == null) {
                 continue; // invalid file
             }
 

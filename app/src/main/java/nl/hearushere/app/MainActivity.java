@@ -204,7 +204,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
             @Override
             public void onMapLoaded() {
 
-                ArrayList<ArrayList<LatLng>> pointsList = walk.getPoints();
+                List<ArrayList<LatLng>> pointsList = walk.getPoints();
 
                 Builder builder = new LatLngBounds.Builder();
 

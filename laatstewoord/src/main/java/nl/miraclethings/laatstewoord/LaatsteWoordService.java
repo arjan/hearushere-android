@@ -290,11 +290,19 @@ public class LaatsteWoordService extends AudioWalkService {
             }
             lastUrl = url.url;
 
+            if (player != null) {
+                player.stop();
+                player.release();
+            }
+
             System.out.println("playTriggerSound " + url.url);
             player = Utils.playSoundOnce(LaatsteWoordService.this, url, new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
+                    System.out.println(lastUrl + " done");
+
                     player = null;
+                    lastUrl = null;
                     checkTriggersDone();
                 }
             });

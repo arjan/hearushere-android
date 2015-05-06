@@ -174,7 +174,9 @@ public class Utils {
     public static MediaPlayer playSoundOnce(Context context, Triggers.Url url, MediaPlayer.OnCompletionListener onDone) {
         MediaPlayer player = new MediaPlayer();
         try {
-            player.setDataSource(context, Uri.fromFile(url.getCacheFile(context)));
+            Uri uri = Uri.fromFile(url.getCacheFile(context));
+            System.out.println("play " + uri.toString());
+            player.setDataSource(context, uri);
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.prepare();
             if (onDone != null) {
