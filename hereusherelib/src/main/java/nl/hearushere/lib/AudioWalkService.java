@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.List;
 
 import nl.hearushere.lib.data.Track;
-import nl.hearushere.lib.R;
 import nl.hearushere.lib.data.Walk;
 import nl.hearushere.lib.net.HttpSpiceService;
 
@@ -81,7 +80,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
             stopSelf();
         }
 
-        public void startPlayback(final Walk walk) {
+        public void beginWalk(final Walk walk) {
             AudioWalkService.this.startPlayback(walk);
         }
 
@@ -89,7 +88,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
             return mCurrentWalk;
         }
 
-        public void stopPlayback() {
+        public void endWalk() {
             AudioWalkService.this.stopPlayback();
         }
 
@@ -108,8 +107,6 @@ public abstract class AudioWalkService extends Service implements LocationListen
             HttpSpiceService.class);
 
     private LocationManager mLocationManager;
-
-    private Location mLastSensedLocation;
 
     @Override
     public void onCreate() {
@@ -134,13 +131,14 @@ public abstract class AudioWalkService extends Service implements LocationListen
         mSpiceManager.start(this);
     }
 
-    private void startPlayback(Walk walk) {
+    protected void startPlayback(Walk walk) {
         if (mCurrentWalk != null) {
             stopPlayback();
         }
-        mCurrentWalk = walk;
-        mNotificationController.setCurrentWalk(mCurrentWalk);
 
+        mCurrentWalk = walk;
+
+        mNotificationController.setCurrentWalk(mCurrentWalk);
         mNotificationController.updateServiceNotification();
 
         Location loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -157,7 +155,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
 
     }
 
-    public void loadTracks() {
+    protected void loadTracks() {
         mHandler.post(new Runnable() {
 
             @Override
@@ -189,15 +187,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
                 }
 
                 if (mTrackList != null) {
-
-                    mHearUsHereAudioController.startWalk(mCurrentWalk);
-
-                    mSoundsLoaded = true;
-                    showNotification("Please go to the area located on the map to begin.");
-                    if (mLastLocation != null) {
-                        onLocationUpdate(mLastLocation);
-                    }
-
+                    soundsLoaded();
                 } else {
                     // starting aborted
                     hideNotification();
@@ -206,7 +196,16 @@ public abstract class AudioWalkService extends Service implements LocationListen
         });
     }
 
-    private void stopPlayback() {
+    protected void soundsLoaded() {
+        mHearUsHereAudioController.startWalk(mCurrentWalk);
+        mSoundsLoaded = true;
+        showNotification("Please go to the area located on the map to begin.");
+        if (mLastLocation != null) {
+            onLocationUpdate(mLastLocation);
+        }
+    }
+
+    protected void stopPlayback() {
         if (mAudioEventListener != null) {
             mAudioEventListener.showLoader(false);
         }
@@ -328,6 +327,8 @@ public abstract class AudioWalkService extends Service implements LocationListen
         // TODO Auto-generated method stub
 
     }
+
+    private Location mLastSensedLocation;
 
     @Override
     public void onLocationChanged(final Location location) {

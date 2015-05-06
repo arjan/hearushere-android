@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import nl.hearushere.lib.Constants;
 
@@ -189,5 +190,49 @@ public class Walk {
 
     public void setCurrentDistance(double currentDistance) {
         this.currentDistance = currentDistance;
+    }
+
+    public java.util.List<double[]> getAreas() {
+        return areas;
+    }
+
+    public void setAreas(java.util.List<double[]> areas) {
+        this.areas = areas;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public void setCredits(String credits) {
+        this.credits = credits;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isTracksSynchronized() {
+        return tracksSynchronized;
+    }
+
+    public void setSounds(java.util.List<Track> sounds) {
+        this.sounds = sounds;
+    }
+
+    public LatLng getmCenter() {
+        return mCenter;
+    }
+
+    public void setmCenter(LatLng mCenter) {
+        this.mCenter = mCenter;
     }
 }

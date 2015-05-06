@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.hearushere.lib.data.Track;
+import nl.hearushere.lib.data.Triggers;
 import nl.hearushere.lib.data.Walk;
 import roboguice.util.temp.Ln;
 
@@ -26,8 +27,10 @@ public class HttpSpiceService extends SpiceService {
 		cacheableClasses.add(Track.class);
 		cacheableClasses.add(Walk.List.class);
 		cacheableClasses.add(Walk.class);
+		cacheableClasses.add(Triggers.class);
+		cacheableClasses.add(Triggers.Url.class);
 
-		Ln.getConfig().setLoggingLevel(Log.WARN);
+		Ln.getConfig().setLoggingLevel(Log.DEBUG);
 
 		// // init
 		Jackson2ObjectPersisterFactory jacksonObjectPersisterFactory = new Jackson2ObjectPersisterFactory(

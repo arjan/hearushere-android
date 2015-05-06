@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="main_bg">#173B1C</color>
+    <color name="main_fg">#ffffff</color>
+
+    <color name="notification_bg">#aa000000</color>
+    <color name="notification_fg">#ffffff</color>
+
+    <color name="polygon_stroke">#000000</color>
+    <color name="polygon_fill">#33ffff00</color>
+
+</resources>

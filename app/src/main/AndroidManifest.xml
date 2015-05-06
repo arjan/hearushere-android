@@ -32,7 +32,7 @@
         </activity>
 
         <service
-            android:name="nl.hearushere.app.AudioWalkService"
+            android:name="nl.hearushere.app.HearUsHereService"
             android:exported="false" />
 
 

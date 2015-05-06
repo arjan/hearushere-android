@@ -9,7 +9,7 @@ import nl.hearushere.app.main.R;
  *
  * Created by Arjan Scherpenisse on 6-5-15.
  */
-public class AudioWalkService extends nl.hearushere.lib.AudioWalkService {
+public class HearUsHereService extends nl.hearushere.lib.AudioWalkService {
     @Override
     public int getStatIcon() {
         return R.drawable.ic_stat_huh;

@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
         OnMapClickListener {
     protected SpiceManager mSpiceManager = new SpiceManager(
             HttpSpiceService.class);
-    public static final String TAG = AudioWalkService.class.getSimpleName();
+    public static final String TAG = HearUsHereService.class.getSimpleName();
 
     private ServiceConnection mServiceConnection;
     protected nl.hearushere.lib.AudioWalkService.LocalBinder mServiceInterface;
@@ -305,9 +305,9 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
                     return;
                 }
             }
-            mServiceInterface.startPlayback(walk);
+            mServiceInterface.beginWalk(walk);
         } else {
-            mServiceInterface.stopPlayback();
+            mServiceInterface.endWalk();
         }
     }
 
@@ -368,13 +368,13 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
     }
 
     private void connectAudioService() {
-        Intent service = new Intent(this, AudioWalkService.class);
+        Intent service = new Intent(this, HearUsHereService.class);
         startService(service);
 
         mServiceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                mServiceInterface = (AudioWalkService.LocalBinder) service;
+                mServiceInterface = (HearUsHereService.LocalBinder) service;
                 Log.v(TAG, "Bound to service!");
                 mServiceInterface.setAudioEventListener(MainActivity.this);
 

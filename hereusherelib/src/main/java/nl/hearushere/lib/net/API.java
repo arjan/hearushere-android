@@ -2,6 +2,7 @@ package nl.hearushere.lib.net;
 
 import nl.hearushere.lib.Constants;
 import nl.hearushere.lib.Utils;
+import nl.hearushere.lib.data.Triggers;
 import nl.hearushere.lib.data.Walk;
 import nl.hearushere.lib.data.Walk.List;
 
@@ -36,6 +37,20 @@ public class API {
 		}, "walks", DurationInMillis.ONE_WEEK, listener);
 	}
 
+
+	public void getLaatsteWoordTriggers(RequestListener<Triggers> listener) {
+		System.out.println("-- get--");
+		mSpiceManager.execute(new SpiceRequest<Triggers>(
+				Triggers.class) {
+			@Override
+			public Triggers loadDataFromNetwork() throws Exception {
+				System.out.println(" -- GET TRIGGERS --");
+				JsonNode node = HttpRequest.doRequest("GET",
+						Constants.LAATSTEWOORD_TRIGGERS_URL, null);
+				return mMapper.treeToValue(node, Triggers.class);
+			}
+		}, "triggers", DurationInMillis.ONE_WEEK, listener);
+	}
 	public void clearCache() {
 		mSpiceManager.removeAllDataFromCache();
 	}

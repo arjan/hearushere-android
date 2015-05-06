@@ -25,6 +25,9 @@ public class Track {
     @JsonProperty
     private String file;
 
+    @JsonProperty
+    private String url;
+
 	@JsonProperty
 	private double[] location;
 
@@ -50,7 +53,7 @@ public class Track {
     transient private double currentDistance;
 
 	public String getStreamUrl() {
-        return Constants.CONTENT_URL_PREFIX + file;
+        return url != null ? url : Constants.CONTENT_URL_PREFIX + file;
 	}
 
 	public File getCacheFile(Context context) {

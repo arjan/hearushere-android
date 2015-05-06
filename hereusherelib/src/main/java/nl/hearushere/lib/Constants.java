@@ -1,13 +1,13 @@
 package nl.hearushere.lib;
 
-import nl.hearushere.lib.BuildConfig;
-
 public class Constants {
 
-	public static final boolean USE_DEBUG_LOCATION = BuildConfig.DEBUG;
+	public static final boolean USE_DEBUG_LOCATION = true; // BuildConfig.DEBUG;
 	
 	public static final String API_URL_PREFIX = "http://api.hearushere.nl/";
-	
+
+	public static final String LAATSTEWOORD_TRIGGERS_URL = "http://hearushere.nl/triggers.json";
+
 	public static final String CACHE_DIR = "hearushere";
     public static final String CONTENT_URL_PREFIX = "http://hearushere.nl/walks/";
 
