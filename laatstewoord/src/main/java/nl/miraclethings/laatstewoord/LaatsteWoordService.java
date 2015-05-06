@@ -159,11 +159,6 @@ public class LaatsteWoordService extends AudioWalkService {
                 System.out.println("PLAY::: " + sound.url + " " + trigger.toString());
 
                 IN_TRIGGER_AREA.playTriggerSound(sound);
-
-//                if (currentArea.sounds.size() == 0) {
-//                    System.out.println("All sounds done in this area");
-//                }
-
             }
 
 
@@ -277,29 +272,32 @@ public class LaatsteWoordService extends AudioWalkService {
     };
     class TriggerAreaState implements State {
 
-        private HashMap<String, MediaPlayer> players;
+        private String lastUrl;
+        private MediaPlayer player;
 
         @Override
         public void enter() {
-            players = new HashMap<>();
         }
 
         @Override
         public void exit() {
-            players.clear();
         }
 
-        public void playTriggerSound(Triggers.Url url) {
+        public void playTriggerSound(final Triggers.Url url) {
+            if (lastUrl != null && lastUrl.equals(url.url)) {
+                System.out.println("Already playing.. " + url.url);
+                return;
+            }
+            lastUrl = url.url;
+
             System.out.println("playTriggerSound " + url.url);
-            MediaPlayer p = Utils.playSoundOnce(LaatsteWoordService.this, url, new MediaPlayer.OnCompletionListener() {
+            player = Utils.playSoundOnce(LaatsteWoordService.this, url, new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
+                    player = null;
                     checkTriggersDone();
                 }
             });
-            // keep around for reference
-            players.put(url.url, p);
-
         }
         public String toString() {
             return "IN_TRIGGER_AREA";

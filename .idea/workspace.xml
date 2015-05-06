@@ -32,37 +32,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="79cd2e96-7729-42e2-9df1-321f2f61b66c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hereusherelib/src/main/ic_launcher-web.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/ic_launcher-web.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-xxxhdpi/ic_launcher.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-hdpi/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-hdpi-v11/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-mdpi/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-mdpi-v11/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-xhdpi/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-xhdpi-v11/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-xxhdpi/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-xxhdpi-v11/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-xxxhdpi/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/drawable-xxxhdpi-v11/ic_stat_laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/laatstewoord/src/main/java/nl/miraclethings/laatstewoord/LaatsteWoordService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-hdpi/ic_launcher.png" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-hdpi/ic_launcher.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-mdpi/ic_launcher.png" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-mdpi/ic_launcher.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-xhdpi/ic_launcher.png" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-xhdpi/ic_launcher.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/mipmap-xxhdpi/ic_launcher.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/laatstewoord/src/main/AndroidManifest.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/AudioWalkService.java" afterPath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/AudioWalkService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/HearUsHereAudioController.java" afterPath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/HearUsHereAudioController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/java/nl/miraclethings/laatstewoord/MainActivity.java" afterPath="$PROJECT_DIR$/laatstewoord/src/main/java/nl/miraclethings/laatstewoord/MainActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/data/Track.java" afterPath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/data/Track.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/data/Triggers.java" afterPath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/data/Triggers.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/Utils.java" afterPath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/Utils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/data/Walk.java" afterPath="$PROJECT_DIR$/hereusherelib/src/main/java/nl/hearushere/lib/data/Walk.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/arjan.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/arjan.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/res/values/colors.xml" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/values/colors.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/laatstewoord/src/main/res/values/strings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/laatstewoord/src/main/java/nl/miraclethings/laatstewoord/LaatsteWoordService.java" afterPath="$PROJECT_DIR$/laatstewoord/src/main/java/nl/miraclethings/laatstewoord/LaatsteWoordService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="HearUsHereApp.iws" />
@@ -146,8 +116,8 @@
       <file leaf-file-name="LaatsteWoordService.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/laatstewoord/src/main/java/nl/miraclethings/laatstewoord/LaatsteWoordService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33243242">
-              <caret line="226" column="33" selection-start-line="226" selection-start-column="33" selection-end-line="226" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.33513513">
+              <caret line="286" column="35" selection-start-line="286" selection-start-column="35" selection-end-line="286" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#827#828#0" expanded="true" />
@@ -163,22 +133,18 @@
                 <element signature="e#1316#1317#0" expanded="true" />
                 <element signature="e#1434#1435#0" expanded="true" />
                 <element signature="e#1464#1465#0" expanded="true" />
-                <element signature="e#6314#6315#0" expanded="true" />
-                <element signature="e#6354#6355#0" expanded="true" />
-                <element signature="e#6575#6576#0" expanded="true" />
-                <element signature="e#6614#6615#0" expanded="true" />
-                <element signature="e#6971#6972#0" expanded="true" />
-                <element signature="e#7015#7016#0" expanded="true" />
-                <element signature="e#7172#7173#0" expanded="true" />
-                <element signature="e#7221#7222#0" expanded="true" />
-                <element signature="e#7269#7270#0" expanded="true" />
-                <element signature="e#7308#7309#0" expanded="true" />
-                <element signature="e#7510#7708#0" expanded="true" />
-                <element signature="e#7707#7708#0" expanded="true" />
-                <element signature="e#7833#7834#0" expanded="true" />
-                <element signature="e#7881#7882#0" expanded="true" />
-                <element signature="e#8308#8309#0" expanded="true" />
-                <element signature="e#8351#8352#0" expanded="true" />
+                <element signature="e#6162#6163#0" expanded="true" />
+                <element signature="e#6202#6203#0" expanded="true" />
+                <element signature="e#6423#6424#0" expanded="true" />
+                <element signature="e#6462#6463#0" expanded="true" />
+                <element signature="e#6819#6820#0" expanded="true" />
+                <element signature="e#6863#6864#0" expanded="true" />
+                <element signature="e#7503#7736#0" expanded="true" />
+                <element signature="e#7735#7736#0" expanded="true" />
+                <element signature="e#7782#7783#0" expanded="true" />
+                <element signature="e#7830#7831#0" expanded="true" />
+                <element signature="e#8257#8258#0" expanded="true" />
+                <element signature="e#8300#8301#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -3689,8 +3655,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/laatstewoord/src/main/java/nl/miraclethings/laatstewoord/LaatsteWoordService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33243242">
-          <caret line="226" column="33" selection-start-line="226" selection-start-column="33" selection-end-line="226" selection-end-column="33" />
+        <state vertical-scroll-proportion="0.33513513">
+          <caret line="286" column="35" selection-start-line="286" selection-start-column="35" selection-end-line="286" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#827#828#0" expanded="true" />
@@ -3706,22 +3672,18 @@
             <element signature="e#1316#1317#0" expanded="true" />
             <element signature="e#1434#1435#0" expanded="true" />
             <element signature="e#1464#1465#0" expanded="true" />
-            <element signature="e#6314#6315#0" expanded="true" />
-            <element signature="e#6354#6355#0" expanded="true" />
-            <element signature="e#6575#6576#0" expanded="true" />
-            <element signature="e#6614#6615#0" expanded="true" />
-            <element signature="e#6971#6972#0" expanded="true" />
-            <element signature="e#7015#7016#0" expanded="true" />
-            <element signature="e#7172#7173#0" expanded="true" />
-            <element signature="e#7221#7222#0" expanded="true" />
-            <element signature="e#7269#7270#0" expanded="true" />
-            <element signature="e#7308#7309#0" expanded="true" />
-            <element signature="e#7510#7708#0" expanded="true" />
-            <element signature="e#7707#7708#0" expanded="true" />
-            <element signature="e#7833#7834#0" expanded="true" />
-            <element signature="e#7881#7882#0" expanded="true" />
-            <element signature="e#8308#8309#0" expanded="true" />
-            <element signature="e#8351#8352#0" expanded="true" />
+            <element signature="e#6162#6163#0" expanded="true" />
+            <element signature="e#6202#6203#0" expanded="true" />
+            <element signature="e#6423#6424#0" expanded="true" />
+            <element signature="e#6462#6463#0" expanded="true" />
+            <element signature="e#6819#6820#0" expanded="true" />
+            <element signature="e#6863#6864#0" expanded="true" />
+            <element signature="e#7503#7736#0" expanded="true" />
+            <element signature="e#7735#7736#0" expanded="true" />
+            <element signature="e#7782#7783#0" expanded="true" />
+            <element signature="e#7830#7831#0" expanded="true" />
+            <element signature="e#8257#8258#0" expanded="true" />
+            <element signature="e#8300#8301#0" expanded="true" />
           </folding>
         </state>
       </provider>
