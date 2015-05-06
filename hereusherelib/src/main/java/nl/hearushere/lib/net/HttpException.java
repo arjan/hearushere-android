@@ -1,4 +1,4 @@
-package nl.hearushere.app.net;
+package nl.hearushere.lib.net;
 
 public class HttpException extends Exception {
 

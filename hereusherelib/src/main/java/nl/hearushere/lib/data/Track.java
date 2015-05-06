@@ -1,4 +1,4 @@
-package nl.hearushere.app.data;
+package nl.hearushere.lib.data;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -11,7 +11,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.io.File;
 
-import nl.hearushere.app.Constants;
+import nl.hearushere.lib.Constants;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
 public class Track {

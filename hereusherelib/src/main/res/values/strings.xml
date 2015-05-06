@@ -1,0 +1,6 @@
+<resources>
+    <string name="load_progress">Loading track %1$d of %2$d…</string>
+    <string name="notification_progress_text">Audio tour in progress. Click to stop.</string>
+    <string name="notification_progress_text_small">Audio tour in progress.</string>
+    <string name="notification_not_started_text">Audio tour waiting to start.</string>
+</resources>

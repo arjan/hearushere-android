@@ -1,10 +1,10 @@
-package nl.hearushere.app.net;
+package nl.hearushere.lib.net;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.hearushere.app.data.Track;
-import nl.hearushere.app.data.Walk;
+import nl.hearushere.lib.data.Track;
+import nl.hearushere.lib.data.Walk;
 import roboguice.util.temp.Ln;
 
 import android.app.Application;

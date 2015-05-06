@@ -1,6 +1,6 @@
-package nl.hearushere.app;
+package nl.hearushere.lib;
 
-import nl.hearushere.app.main.BuildConfig;
+import nl.hearushere.lib.BuildConfig;
 
 public class Constants {
 

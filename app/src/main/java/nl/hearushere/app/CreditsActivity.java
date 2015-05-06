@@ -1,6 +1,7 @@
 package nl.hearushere.app;
 
-import nl.hearushere.app.data.Walk;
+import nl.hearushere.lib.Utils;
+import nl.hearushere.lib.data.Walk;
 import nl.hearushere.app.main.R;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 

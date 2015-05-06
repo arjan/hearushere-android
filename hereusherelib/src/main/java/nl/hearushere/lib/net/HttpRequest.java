@@ -1,4 +1,4 @@
-package nl.hearushere.app.net;
+package nl.hearushere.lib.net;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

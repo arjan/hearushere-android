@@ -1,9 +1,9 @@
-package nl.hearushere.app.net;
+package nl.hearushere.lib.net;
 
-import nl.hearushere.app.Constants;
-import nl.hearushere.app.Utils;
-import nl.hearushere.app.data.Walk;
-import nl.hearushere.app.data.Walk.List;
+import nl.hearushere.lib.Constants;
+import nl.hearushere.lib.Utils;
+import nl.hearushere.lib.data.Walk;
+import nl.hearushere.lib.data.Walk.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="notification_progress_text">Audio tour in progress. Click to stop.</string>
-    <string name="notification_progress_text_small">Audio tour in progress.</string>
-    <string name="notification_not_started_text">Audio tour waiting to start.</string>
 
     <string name="app_credits">Credits</string>
     
     <string name="btn_stop">Stop</string>
     <string name="btn_about">About this app</string>
-    <string name="load_progress">Loading track %1$d of %2$d…</string>
-    
+
 </resources>

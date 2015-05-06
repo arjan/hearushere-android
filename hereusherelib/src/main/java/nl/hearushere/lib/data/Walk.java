@@ -1,6 +1,4 @@
-package nl.hearushere.app.data;
-
-import android.location.Location;
+package nl.hearushere.lib.data;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -8,13 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
 
-import nl.hearushere.app.Constants;
+import nl.hearushere.lib.Constants;
 
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
 public class Walk {
@@ -131,7 +124,7 @@ public class Walk {
     }
 
     public LatLng getCenter() {
-        if (mCenter == null) {
+        if (mCenter == null && areas != null) {
             double minLat = 0, minLng = 0, maxLat = 0, maxLng = 0;
             boolean first = true;
             for (double[] area : areas) {

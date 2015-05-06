@@ -57,23 +57,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import nl.hearushere.app.AudioWalkService.AudioEventListener;
-import nl.hearushere.app.AudioWalkService.LocalBinder;
-import nl.hearushere.app.data.Track;
-import nl.hearushere.app.data.Walk;
+import nl.hearushere.lib.Constants;
+import nl.hearushere.lib.Utils;
+import nl.hearushere.lib.data.Walk;
 import nl.hearushere.app.main.R;
-import nl.hearushere.app.net.API;
-import nl.hearushere.app.net.HttpSpiceService;
+import nl.hearushere.lib.net.API;
+import nl.hearushere.lib.net.HttpSpiceService;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends Activity implements AudioEventListener,
+public class MainActivity extends Activity implements nl.hearushere.lib.AudioWalkService.AudioEventListener,
         OnMapClickListener {
     protected SpiceManager mSpiceManager = new SpiceManager(
             HttpSpiceService.class);
     public static final String TAG = AudioWalkService.class.getSimpleName();
 
     private ServiceConnection mServiceConnection;
-    protected LocalBinder mServiceInterface;
+    protected nl.hearushere.lib.AudioWalkService.LocalBinder mServiceInterface;
 
     private TextView mTvNotification;
 
@@ -542,8 +541,10 @@ public class MainActivity extends Activity implements AudioEventListener,
     public void sortWalksByClosestDistance(final LatLng loc) {
         float[] results = new float[3];
 
+        System.out.println("WALKS: " + mWalks.size());
         for (Walk walks : mWalks) {
             LatLng c = walks.getCenter();
+            if (c == null) continue;
             Location.distanceBetween(loc.latitude, loc.longitude,
                     c.latitude, c.longitude, results);
             double distance = results[0];
