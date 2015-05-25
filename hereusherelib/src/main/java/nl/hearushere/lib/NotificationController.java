@@ -57,7 +57,10 @@ public class NotificationController {
         });
     }
 
-
+    public void hideNotification() {
+        ((NotificationManager) parent.getSystemService(Context.NOTIFICATION_SERVICE))
+                .cancel(NOTIFICATION_ID);
+    }
     public void updateServiceNotification() {
         ((NotificationManager) parent.getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(NOTIFICATION_ID, buildServiceNotification());
@@ -114,7 +117,7 @@ public class NotificationController {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private Notification.Action generateAction(int icon, String title, String intentAction) {
-        Intent intent = new Intent(parent.getApplicationContext(), AudioWalkService.class);
+        Intent intent = new Intent(parent.getApplicationContext(), parent.getAudioService());
         intent.setAction(intentAction);
         PendingIntent pendingIntent = PendingIntent.getService(parent.getApplicationContext(), 1, intent, 0);
         return new Notification.Action.Builder(icon, title, pendingIntent).build();

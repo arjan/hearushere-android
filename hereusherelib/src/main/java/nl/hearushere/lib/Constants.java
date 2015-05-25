@@ -2,8 +2,6 @@ package nl.hearushere.lib;
 
 public class Constants {
 
-	public static final boolean USE_DEBUG_LOCATION = true; // BuildConfig.DEBUG;
-	
 	public static final String API_URL_PREFIX = "http://api.hearushere.nl/";
 
 	public static final String LAATSTEWOORD_TRIGGERS_URL = "http://hearushere.nl/triggers.json";

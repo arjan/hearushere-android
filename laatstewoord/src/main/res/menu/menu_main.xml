@@ -5,8 +5,13 @@
         android:title="@string/app_credits"
         />
 
-    <item android:id="@+id/menu_debug"
-        android:title="@string/show_map"
+    <item android:id="@+id/menu_debug_draw"
+        android:title="@string/debug_draw"
+        android:checkable="true"
+        />
+
+    <item android:id="@+id/menu_debug_location"
+        android:title="@string/debug_location"
         android:checkable="true"
         />
 </menu>

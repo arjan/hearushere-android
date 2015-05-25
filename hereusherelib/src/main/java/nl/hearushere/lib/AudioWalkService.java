@@ -45,7 +45,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
         void showNetworkErrorMessage();
         void showLoader(boolean flag);
         void uiUpdate();
-
+        boolean useDebugLocation();
     }
 
     public static final String TAG = AudioWalkService.class.getSimpleName();
@@ -73,12 +73,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
         }
 
         public void stopService() {
-
-            mLocationManager.removeUpdates(AudioWalkService.this);
-
-            mHearUsHereAudioController.stopService();
-            mHandlerThread.quit();
-            stopSelf();
+            AudioWalkService.this.stop();
         }
 
         public void beginWalk(final Walk walk) {
@@ -107,6 +102,16 @@ public abstract class AudioWalkService extends Service implements LocationListen
             return mLastLocation;
         }
 
+    }
+
+    protected void stop() {
+        mLocationManager.removeUpdates(AudioWalkService.this);
+
+        mHearUsHereAudioController.stopService();
+        mHandlerThread.quit();
+
+        stopForeground(true);
+        stopSelf();
     }
 
     protected SpiceManager mSpiceManager = new SpiceManager(
@@ -270,6 +275,8 @@ public abstract class AudioWalkService extends Service implements LocationListen
     public void onDestroy() {
         mHandlerThread.quit();
 
+        System.out.println("AudioWalkService onDestroy");
+
         super.onDestroy();
     }
 
@@ -349,7 +356,7 @@ public abstract class AudioWalkService extends Service implements LocationListen
     @Override
     public void onLocationChanged(final Location location) {
         if (location == null || !mSoundsLoaded || mTrackList == null
-                || Constants.USE_DEBUG_LOCATION) {
+                || (mAudioEventListener != null && mAudioEventListener.useDebugLocation()) ) {
             return;
         }
 
@@ -372,5 +379,6 @@ public abstract class AudioWalkService extends Service implements LocationListen
     public abstract int getStatIcon();
     public abstract int getAppIcon();
     public abstract int getAppName();
+    public abstract Class<? extends Service> getAudioService();
     public abstract Class<? extends Activity> getMainActivity();
 }

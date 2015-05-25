@@ -27,17 +27,14 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import nl.hearushere.lib.AudioWalkService;
-import nl.hearushere.lib.Constants;
 import nl.hearushere.lib.data.Track;
 import nl.hearushere.lib.data.Triggers;
 import nl.hearushere.lib.net.API;
@@ -59,6 +56,9 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
     private LaatsteWoordService.LocalBinder mServiceInterface;
     private Marker mDebugMarker;
     private boolean hasMap;
+    private boolean mDrawMarkers = false;
+    private boolean mUseDebugLocation = false;
+    private boolean mStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +71,30 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
 
         mAPI = new API(mSpiceManager);
 
+        if (savedInstanceState != null) {
+            mStarted = savedInstanceState.getBoolean("started");
+            mUseDebugLocation = savedInstanceState.getBoolean("useDebugLocation");
+            mDrawMarkers = savedInstanceState.getBoolean("drawMarkers");
+        }
+
         mButton = (Button) findViewById(R.id.button_start_stop);
-        mButton.setVisibility(View.GONE);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mStarted) {
+                    connectAudioService();
+                    mButton.setText("Stop");
+                    mStarted = true;
+                } else {
+                    // stop
+                    unbindAudioService(true);
+                    mButton.setText("Start");
+                    mStarted = false;
+                }
+            }
+        });
+
+        mButton.setText(mStarted ? "Stop" : "Start");
 
         showLoader(true);
         mAPI.getLaatsteWoordTriggers(new RequestListener<Triggers>() {
@@ -92,31 +114,47 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
                 //Walk walk = triggers.buildWalk();
                 initMap();
 
-                connectAudioService();
+                uiUpdate();
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("started", mStarted);
+        outState.putBoolean("useDebugLocation", mUseDebugLocation);
+        outState.putBoolean("drawMarkers", mDrawMarkers);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         checkServicesConnected();
+        if (mStarted) {
+            connectAudioService();
+        }
     }
 
     @Override
     protected void onPause() {
+        if (mServiceInterface != null) {
+            unbindAudioService(mServiceInterface.getCurrentWalk() == null);
+        }
+        super.onPause();
+    }
+
+    private void unbindAudioService(boolean stopPlayback) {
         if (mServiceConnection != null) {
             if (mServiceInterface != null) {
                 mServiceInterface.setAudioEventListener(null);
-                if (mServiceInterface.getCurrentWalk() == null) {
+                if (stopPlayback) {
                     mServiceInterface.stopService();
                 }
             }
             unbindService(mServiceConnection);
             mServiceConnection = null;
         }
-
-        super.onPause();
     }
 
     @Override
@@ -133,12 +171,13 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
 
     @Override
     public void showNotification(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        mTvNotification.setText(message);
+        mTvNotification.animate().alpha(1f).setDuration(500).start();
     }
 
     @Override
     public void hideNotification() {
-
+        mTvNotification.animate().alpha(0f).setDuration(500).start();
     }
 
     @Override
@@ -153,30 +192,48 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
 
     @Override
     public void uiUpdate() {
-        if (mServiceInterface == null) {
-            mButton.setVisibility(View.GONE);
+        if (mTriggers == null) {
             return;
         }
 
         System.out.println("UI UPDATE");
 
-        if (!hasMap && mServiceInterface.getTriggers() != null) {
+        if (!hasMap && mTriggers != null) {
             hasMap = true;
         }
+
         mMap.clear();
 
-        if (mServiceInterface.getCurrentWalk() != null) {
-            addMapMarkers(mServiceInterface.getCurrentWalk().getSounds());
+        if (mTriggers != null) {
+
+            mMap.addPolygon(new PolygonOptions()
+                    .addAll(mTriggers.getDisplayCoords())
+                    .strokeWidth(0f)
+                    .fillColor(
+                            getResources().getColor(R.color.polygon_fill)));
+
         }
 
-        if (mServiceInterface.getTriggers() != null) {
-            addMapTriggers(mServiceInterface.getTriggers());
-        }
+        if (mDrawMarkers) {
+            if (mServiceInterface != null && mServiceInterface.getCurrentWalk() != null) {
+                addMapMarkers(mServiceInterface.getCurrentWalk().getSounds());
+            }
 
-        if (mServiceInterface.getLastLocation() != null) {
-            mDebugMarker = mMap.addMarker(new MarkerOptions().position(mServiceInterface.getLastLocation())
-                    .draggable(false));
+            if (mTriggers != null) {
+                addMapTriggers(mTriggers);
+            }
+
+            if (mServiceInterface != null && mServiceInterface.getLastLocation() != null) {
+                mDebugMarker = mMap.addMarker(new MarkerOptions().position(mServiceInterface.getLastLocation())
+                        .draggable(false));
+            }
+
         }
+    }
+
+    @Override
+    public boolean useDebugLocation() {
+        return mUseDebugLocation;
     }
 
 
@@ -190,9 +247,9 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
         mMap.setMyLocationEnabled(true);
         mMap.clear();
 
-        if (Constants.USE_DEBUG_LOCATION) {
-            mMap.setOnMapClickListener(this);
-        }
+        mMap.setOnMapClickListener(this);
+
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -207,12 +264,6 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
                     builder.include(point);
                 }
 
-                mMap.addPolygon(new PolygonOptions()
-                        .addAll(points)
-                        .strokeWidth(0f)
-                        .fillColor(
-                                getResources().getColor(R.color.polygon_fill)));
-
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 80));
             }
         });
@@ -220,15 +271,16 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
 
     @Override
     public void onMapClick(LatLng latlng) {
-        mServiceInterface.setDebugLocation(latlng);
 
-        if (mDebugMarker != null) {
-            mDebugMarker.setPosition(latlng);
-        } else {
-            mDebugMarker = mMap.addMarker(new MarkerOptions().position(mServiceInterface.getLastLocation())
-                    .draggable(false));
+        if (mUseDebugLocation && mServiceInterface != null) {
+            mServiceInterface.setDebugLocation(latlng);
+            if (mDebugMarker != null) {
+                mDebugMarker.setPosition(latlng);
+            } else {
+                mDebugMarker = mMap.addMarker(new MarkerOptions().position(mServiceInterface.getLastLocation())
+                        .draggable(false));
+            }
         }
-
     }
 
     private void checkServicesConnected() {
@@ -260,12 +312,14 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
                 mServiceInterface = (LaatsteWoordService.LocalBinder) service;
                 Log.v(TAG, "Bound to service!");
                 mServiceInterface.setAudioEventListener(MainActivity.this);
+                mButton.setText("Stop");
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 mServiceInterface = null;
                 Log.v(TAG, "Disconnected from service!");
+                mButton.setText("Start");
             }
         };
 
@@ -313,15 +367,24 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
             //menu.findItem(R.id.menu_credits).setVisible(true);
+
+        menu.findItem(R.id.menu_debug_draw).setChecked(mDrawMarkers);
+        menu.findItem(R.id.menu_debug_location).setChecked(mUseDebugLocation);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.menu_credits:
-//                openWalkCredits(mWalks.get(0));
-//                return true;
+            case R.id.menu_debug_draw:
+                item.setChecked(!item.isChecked());
+                mDrawMarkers = item.isChecked();
+                uiUpdate();
+                break;
+            case R.id.menu_debug_location:
+                item.setChecked(!item.isChecked());
+                mUseDebugLocation = item.isChecked();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

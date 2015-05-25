@@ -1,6 +1,7 @@
 package nl.miraclethings.laatstewoord;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
@@ -44,6 +45,11 @@ public class LaatsteWoordService extends AudioWalkService {
     }
 
     @Override
+    public Class<? extends Service> getAudioService() {
+        return LaatsteWoordService.class;
+    }
+
+    @Override
     public Class<? extends Activity> getMainActivity() {
         return MainActivity.class;
     }
@@ -78,12 +84,11 @@ public class LaatsteWoordService extends AudioWalkService {
 
         }
 
+        System.out.println("aaa");
+
         if (intent != null) {
-            if (NotificationController.ACTION_START.equals(intent.getAction()) && mLastWalk != null) {
-                startPlayback(mLastWalk);
-            }
             if (NotificationController.ACTION_STOP.equals(intent.getAction())) {
-                stopPlayback();
+                stop();
             }
         }
 
@@ -105,11 +110,10 @@ public class LaatsteWoordService extends AudioWalkService {
         }
 
         super.soundsLoaded();
-        showNotification("All sounds loaded, do something now!");
 
         uiUpdate();
 
-        //setState(FIRST_SOUND);
+        setState(FIRST_SOUND);
     }
 
     @Override
@@ -192,6 +196,12 @@ public class LaatsteWoordService extends AudioWalkService {
         return null;
     }
 
+    @Override
+    protected void stop() {
+        super.stop();
+        mNotificationController.hideNotification();
+        setState(null);
+    }
 
     private void setState(State newState) {
         if (mCurrentState == newState) {
@@ -223,11 +233,14 @@ public class LaatsteWoordService extends AudioWalkService {
 
         @Override
         public void enter() {
+            showNotification("You are outside the zone where the story takes place.");
             player = Utils.playSoundOnce(LaatsteWoordService.this, mTriggers.outOfBoundsSound, null);
         }
 
         @Override
         public void exit() {
+            if (player != null) player.release();
+            hideNotification();
         }
 
         @Override
@@ -258,11 +271,18 @@ public class LaatsteWoordService extends AudioWalkService {
 
         @Override
         public void enter() {
-            player = Utils.playSoundOnce(LaatsteWoordService.this, mTriggers.firstSound, null);
+            player = Utils.playSoundOnce(LaatsteWoordService.this, mTriggers.firstSound, new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    System.out.println("First sound done!");
+                    setState(null);
+                }
+            });
         }
 
         @Override
         public void exit() {
+            if (player != null) player.release();
         }
 
         @Override
@@ -281,6 +301,7 @@ public class LaatsteWoordService extends AudioWalkService {
 
         @Override
         public void exit() {
+            if (player != null) player.release();
         }
 
         public void playTriggerSound(final Triggers.Url url) {
@@ -321,13 +342,14 @@ public class LaatsteWoordService extends AudioWalkService {
 
         @Override
         public void enter() {
+            showNotification("Well done!");
             player = Utils.playSoundOnce(LaatsteWoordService.this, mTriggers.lastSound, null);
         }
 
         @Override
         public void exit() {
+            if (player != null) player.release();
         }
-
         @Override
         public String toString() {
             return "LAST_SOUND";

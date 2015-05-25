@@ -2,5 +2,6 @@
     <string name="app_name">Laatste woord</string>
     <string name="title_activity_main">Laatste woord</string>
     <string name="app_credits">Credits</string>
-    <string name="show_map">Show areas</string>
+    <string name="debug_draw">Show sounds</string>
+    <string name="debug_location">Fake locations</string>
 </resources>
