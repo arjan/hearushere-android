@@ -71,16 +71,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|left"
-        android:layout_margin="4dp"
         android:onClick="clickStartStop"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="28dp"
-        android:paddingRight="28dp"
-        android:textColor="@color/main_fg"
-        android:background="@color/main_bg"
         android:text="Start"
-        android:textStyle="bold"
-        android:textSize="20sp" />
+        style="@style/Button" />
 
 </FrameLayout>

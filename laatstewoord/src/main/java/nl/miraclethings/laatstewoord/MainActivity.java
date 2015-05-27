@@ -369,13 +369,18 @@ public class MainActivity extends Activity implements GoogleMap.OnMapClickListen
             //menu.findItem(R.id.menu_credits).setVisible(true);
 
         menu.findItem(R.id.menu_debug_draw).setChecked(mDrawMarkers);
+
         menu.findItem(R.id.menu_debug_location).setChecked(mUseDebugLocation);
+        menu.findItem(R.id.menu_debug_location).setVisible(BuildConfig.DEBUG);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_credits:
+                startActivity(new Intent(this, CreditsActivity.class));
+                break;
             case R.id.menu_debug_draw:
                 item.setChecked(!item.isChecked());
                 mDrawMarkers = item.isChecked();

@@ -28,6 +28,7 @@ public class LaatsteWoordService extends AudioWalkService {
     private Triggers mTriggers;
     private State mCurrentState;
     private Map<Track, Triggers.Url> mTriggerLookup;
+    private boolean firstSoundPlayed;
 
     @Override
     public int getStatIcon() {
@@ -112,8 +113,7 @@ public class LaatsteWoordService extends AudioWalkService {
         super.soundsLoaded();
 
         uiUpdate();
-
-        setState(FIRST_SOUND);
+        firstSoundPlayed = false;
     }
 
     @Override
@@ -129,7 +129,11 @@ public class LaatsteWoordService extends AudioWalkService {
         }
 
         Triggers.Area currentArea = getCurrentArea(location);
-        if (currentArea != null) {
+
+        if (!firstSoundPlayed && Utils.isInsidePolygon(location, mTriggers.getDisplayCoords())) {
+            setState(FIRST_SOUND);
+
+        } else if (currentArea != null) {
 
             setState(IN_TRIGGER_AREA);
             // we are in a trigger area
@@ -234,7 +238,13 @@ public class LaatsteWoordService extends AudioWalkService {
         @Override
         public void enter() {
             showNotification("You are outside the zone where the story takes place.");
-            player = Utils.playSoundOnce(LaatsteWoordService.this, mTriggers.outOfBoundsSound, null);
+            player = Utils.playSoundOnce(LaatsteWoordService.this, mTriggers.outOfBoundsSound, new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    // will trigger a loop, sound is played again on next location update
+                    setState(null);
+                }
+            });
         }
 
         @Override
@@ -275,6 +285,7 @@ public class LaatsteWoordService extends AudioWalkService {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     System.out.println("First sound done!");
+                    firstSoundPlayed = true;
                     setState(null);
                 }
             });
