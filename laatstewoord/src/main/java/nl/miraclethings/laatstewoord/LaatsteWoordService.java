@@ -75,6 +75,11 @@ public class LaatsteWoordService extends AudioWalkService {
 
             mTriggers = (Triggers) intent.getSerializableExtra("triggers");
 
+            if (mTriggers == null) {
+                stopSelf(startId);
+                return START_NOT_STICKY;
+            }
+
             mNotificationController = new NotificationController(this);
             startForeground(NotificationController.NOTIFICATION_ID, mNotificationController.buildServiceNotification());
 
@@ -113,7 +118,7 @@ public class LaatsteWoordService extends AudioWalkService {
         super.soundsLoaded();
 
         uiUpdate();
-        firstSoundPlayed = false;
+        firstSoundPlayed = BuildConfig.DEBUG;
     }
 
     @Override
@@ -166,7 +171,20 @@ public class LaatsteWoordService extends AudioWalkService {
 
                 System.out.println("PLAY::: " + sound.url + " " + trigger.toString());
 
-                IN_TRIGGER_AREA.playTriggerSound(sound);
+                LatLng ll = trigger.getLocationLatLng();
+                float[] results = new float[3];
+                Location.distanceBetween(ll.latitude, ll.longitude, location.latitude, location.longitude, results);
+                float d = results[0];
+
+                float volume = (float) Math.max(0.0,
+                        Math.min(1.0, Math.log(d / (float)trigger.getRadius()) * -0.5));
+
+                System.out.println("volume: " + volume + " " + d);
+
+                IN_TRIGGER_AREA.playTriggerSound(sound, volume);
+            } else {
+                System.out.println("No trigger, but inside trigger area");
+                setState(INSIDE);
             }
 
 
@@ -312,20 +330,18 @@ public class LaatsteWoordService extends AudioWalkService {
 
         @Override
         public void exit() {
-            if (player != null) player.release();
+            tryStopPlayback();
         }
 
-        public void playTriggerSound(final Triggers.Url url) {
+        public void playTriggerSound(final Triggers.Url url, float volume) {
             if (lastUrl != null && lastUrl.equals(url.url)) {
                 System.out.println("Already playing.. " + url.url);
+                setVolume(volume);
                 return;
             }
             lastUrl = url.url;
 
-            if (player != null) {
-                player.stop();
-                player.release();
-            }
+            tryStopPlayback();
 
             System.out.println("playTriggerSound " + url.url);
             player = Utils.playSoundOnce(LaatsteWoordService.this, url, new MediaPlayer.OnCompletionListener() {
@@ -338,7 +354,28 @@ public class LaatsteWoordService extends AudioWalkService {
                     checkTriggersDone();
                 }
             });
+            setVolume(volume);
         }
+
+        private void setVolume(float volume) {
+            if (player != null) {
+                try {
+                    player.setVolume(volume, volume);
+                } catch (IllegalStateException e) {
+
+                }
+            }
+        }
+
+        private void tryStopPlayback() {
+            if (player != null) {
+                try {
+                    player.stop();
+                } catch (IllegalStateException e) {}
+                player.release();
+            }
+        }
+
         public String toString() {
             return "IN_TRIGGER_AREA";
         }
