@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/beacon_lib" />
             <option value="$PROJECT_DIR$/hereusherelib" />
             <option value="$PROJECT_DIR$/laatstewoord" />
           </set>

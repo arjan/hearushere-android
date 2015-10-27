@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HearUsHere.iml" filepath="$PROJECT_DIR$/HearUsHere.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/beacon_lib/beacon_lib.iml" filepath="$PROJECT_DIR$/beacon_lib/beacon_lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/hereusherelib/hereusherelib.iml" filepath="$PROJECT_DIR$/hereusherelib/hereusherelib.iml" />
       <module fileurl="file://$PROJECT_DIR$/laatstewoord/laatstewoord.iml" filepath="$PROJECT_DIR$/laatstewoord/laatstewoord.iml" />
     </modules>

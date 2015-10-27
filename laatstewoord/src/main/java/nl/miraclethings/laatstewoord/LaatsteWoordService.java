@@ -177,7 +177,7 @@ public class LaatsteWoordService extends AudioWalkService {
                 float d = results[0];
 
                 float volume = (float) Math.max(0.0,
-                        Math.min(1.0, Math.log(d / (float)trigger.getRadius()) * -0.5));
+                        Math.min(1.0, (1/Math.pow(trigger.getRadius(), 2)) * Math.pow(d, 2) + 1));
 
                 System.out.println("volume: " + volume + " " + d);
 

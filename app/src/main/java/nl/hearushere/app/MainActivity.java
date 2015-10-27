@@ -57,10 +57,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import nl.hearushere.lib.Constants;
+import nl.hearushere.app.main.BuildConfig;
+import nl.hearushere.app.main.R;
 import nl.hearushere.lib.Utils;
 import nl.hearushere.lib.data.Walk;
-import nl.hearushere.app.main.R;
 import nl.hearushere.lib.net.API;
 import nl.hearushere.lib.net.HttpSpiceService;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -196,7 +196,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
         mMap.setMyLocationEnabled(true);
         mMap.clear();
 
-        if (Constants.USE_DEBUG_LOCATION) {
+        if (useDebugLocation()) {
             mMap.setOnMapClickListener(this);
         }
 
@@ -333,7 +333,15 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
 
     @Override
     public void uiUpdate() {
+        if (mViewPager == null) {
+            return;
+        }
         walkSelected(mViewPager.getCurrentItem());
+    }
+
+    @Override
+    public boolean useDebugLocation() {
+        return BuildConfig.DEBUG;
     }
 
     @Override

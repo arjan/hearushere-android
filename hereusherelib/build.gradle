@@ -22,8 +22,7 @@ android {
 
 dependencies {
     compile files('libs/estimote-sdk-preview.jar')
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.google.android.gms:play-services:6.5.87'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'com.fasterxml.jackson.core:jackson-core:2.4.3'
@@ -33,4 +32,6 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.octo.android.robospice:robospice-spring-android:1.4.14'
     compile 'com.android.support:appcompat-v7:21.0.3'
+    compile project(':beacon_lib')
+    compile project(':beacon_lib')
 }

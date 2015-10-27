@@ -1,8 +1,10 @@
 package nl.hearushere.app;
 
 import android.app.Activity;
+import android.app.Service;
 
 import nl.hearushere.app.main.R;
+import nl.hearushere.lib.AudioWalkService;
 
 /**
  * The main Hear us here audio walk service
@@ -23,6 +25,11 @@ public class HearUsHereService extends nl.hearushere.lib.AudioWalkService {
     @Override
     public int getAppName() {
         return R.string.app_name;
+    }
+
+    @Override
+    public Class<? extends Service> getAudioService() {
+        return AudioWalkService.class;
     }
 
     @Override

@@ -1,1 +1,1 @@
-include ':app', ':hereusherelib', ':laatstewoord'
+include ':app', ':hereusherelib', ':laatstewoord', ':beacon_lib'

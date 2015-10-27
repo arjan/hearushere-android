@@ -2,6 +2,7 @@ package nl.hearushere.lib;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.AudioManager;
@@ -11,13 +12,12 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.os.RemoteException;
 import android.util.Log;
 
-import com.estimote.sdk.Beacon;
-import com.estimote.sdk.BeaconManager;
-import com.estimote.sdk.Region;
 import com.google.android.gms.maps.model.LatLng;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,20 +29,57 @@ import java.util.Map;
 
 import nl.hearushere.lib.data.Track;
 import nl.hearushere.lib.data.Walk;
+import nl.miraclethings.beaconlib.BeaconScannerService;
+import nl.miraclethings.beaconlib.Zone;
+import nl.miraclethings.beaconlib.ZoneMap;
 
 /**
  * Controls the main hear-us-here algorithm
- *
+ * <p>
  * Created by Arjan Scherpenisse on 5-5-15.
  */
-public class HearUsHereAudioController implements BeaconManager.ServiceReadyCallback, BeaconManager.MonitoringListener {
+public class HearUsHereAudioController implements BeaconScannerService.ServiceConnectedCallback, BeaconScannerService.IForegroundListener {
+
+    static Logger logger = LoggerFactory.getLogger(HearUsHereAudioController.class);
 
     private static final String TAG = "HearUsHere";
     private HandlerThread mVolumeHandlerThread;
     private int mTotalDuration;
+
     private long mSoundStartTime;
     private HashMap<String, Track> mBluetoothTrackMap;
     private LatLng mCurrentLocation;
+
+    @Override
+    public void setStatusMessage(String msg) {
+        logger.info("BEACON: {}", msg);
+    }
+
+    @Override
+    public void setCurrentRegion(String i) {
+        logger.info("Set current region: {}", i);
+
+        mCurrentBluetoothSounds.clear();
+        Track bluetoothTrack = mBluetoothTrackMap.get(i);
+        if (bluetoothTrack != null) {
+            mCurrentBluetoothSounds.put(i, bluetoothTrack);
+            logger.info("Play bluetooth sound: {}", bluetoothTrack);
+            playLocationSounds(mCurrentLocation);
+        }
+
+    }
+
+    @Override
+    public void onBeaconServiceConnected(BeaconScannerService.LocalBinder binder) {
+        mBeaconService = binder;
+        mBeaconService.setForegroundListener(this);
+        initializeBluetoothSounds();
+    }
+
+    @Override
+    public void onBeaconServiceDisconnected() {
+        mBeaconService = null;
+    }
 
     interface UICallback {
 
@@ -55,9 +92,12 @@ public class HearUsHereAudioController implements BeaconManager.ServiceReadyCall
 
     private UICallback callback;
     private Walk mWalk;
-    private BeaconManager mBeaconManager;
     private Map<String, Track> mCurrentBluetoothSounds;
     private VolumeManager mVolumeHandler;
+
+    private ServiceConnection mBeaconServiceConnection;
+    private BeaconScannerService.LocalBinder mBeaconService;
+
 
     public HearUsHereAudioController(Context context, UICallback callback) {
         this.context = context;
@@ -313,61 +353,36 @@ public class HearUsHereAudioController implements BeaconManager.ServiceReadyCall
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void startBluetoothScan() {
-        mBeaconManager = new BeaconManager(context);
-        mBeaconManager.connect(this);
+        mBeaconServiceConnection = BeaconScannerService.ensureBeaconService(context, this);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void stopBluetoothScan() {
         System.out.println("stop scan");
-        mBeaconManager.disconnect();
+        if (mBeaconServiceConnection != null && context != null) {
+            context.unbindService(mBeaconServiceConnection);
+        }
     }
 
-    @Override
-    public void onServiceReady() {
+    private void initializeBluetoothSounds() {
+        mCurrentBluetoothSounds = new HashMap<>();
+        mBluetoothTrackMap = new HashMap<>();
 
-        System.out.println("-- ready for beacon service --");
-        mBeaconManager.setBackgroundScanPeriod(5 * 1000, 15 * 1000);
-
-        try {
-            mBeaconManager.setMonitoringListener(this);
-
-            mCurrentBluetoothSounds = new HashMap<>();
-            mBluetoothTrackMap = new HashMap<>();
-
-            for (Track t : mWalk.getBluetoothTracks()) {
-                Region region = convertTrackToRegion(t);
-                if (region != null) {
-                    mBeaconManager.startMonitoring(region);
-                    mBluetoothTrackMap.put("" + t.getId(), t);
-                }
-            }
-
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        ZoneMap m = new ZoneMap();
+        for (Track t : mWalk.getBluetoothTracks()) {
+            String zoneId = String.valueOf(t.getId());
+            m.put(zoneId, createBeaconZone(t));
+            mBluetoothTrackMap.put(zoneId, t);
         }
 
+        mBeaconService.setZoneMap(m);
     }
 
-    private Region convertTrackToRegion(Track t) {
-        if (t.getUuid() == null || t.getMajor() == null || t.getMinor() == null) {
-            return null;
-        }
-        return new Region("" + t.getId(), t.getUuid(), Integer.parseInt(t.getMajor()), Integer.parseInt(t.getMinor()));
+    private Zone createBeaconZone(Track t) {
+        Zone z = new Zone();
+        Zone.Beacon b = new Zone.Beacon(t.getUuid(), Integer.parseInt(t.getMajor()), Integer.parseInt(t.getMinor()));
+        z.getBeacons().add(b);
+        return z;
     }
 
-    @Override
-    public void onEnteredRegion(Region region, List<Beacon> beacons) {
-        Track bluetoothTrack = mBluetoothTrackMap.get(region.getIdentifier());
-        mCurrentBluetoothSounds.put(region.getIdentifier(), bluetoothTrack);
-        System.out.println("Play bluetooth sound!");
-        playLocationSounds(mCurrentLocation);
-    }
-
-    @Override
-    public void onExitedRegion(Region region) {
-        System.out.println("Gone..!!!" + region);
-        mCurrentBluetoothSounds.remove(region.getIdentifier());
-        playLocationSounds(mCurrentLocation);
-    }
 }
