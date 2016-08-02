@@ -2,6 +2,8 @@ package nl.hearushere.app.main;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
@@ -13,6 +15,7 @@ public class HearUsHereApplication extends Application {
 
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         CalligraphyConfig.initDefault("fonts/Relative-Faux.otf", R.attr.fontPath);
     }
 

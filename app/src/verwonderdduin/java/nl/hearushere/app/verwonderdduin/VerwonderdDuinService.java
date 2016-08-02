@@ -1,4 +1,4 @@
-package nl.hearushere.app;
+package nl.hearushere.app.verwonderdduin;
 
 import android.app.Activity;
 import android.app.Service;
@@ -11,7 +11,7 @@ import nl.hearushere.lib.AudioWalkService;
  *
  * Created by Arjan Scherpenisse on 6-5-15.
  */
-public class HearUsHereService extends nl.hearushere.lib.AudioWalkService {
+public class VerwonderdDuinService extends AudioWalkService {
     @Override
     public int getStatIcon() {
         return R.drawable.ic_stat_huh;
@@ -29,7 +29,7 @@ public class HearUsHereService extends nl.hearushere.lib.AudioWalkService {
 
     @Override
     public Class<? extends Service> getAudioService() {
-        return HearUsHereService.class;
+        return VerwonderdDuinService.class;
     }
 
     @Override

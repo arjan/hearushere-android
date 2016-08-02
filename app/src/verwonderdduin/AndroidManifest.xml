@@ -26,6 +26,11 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
+        <service
+            android:name="nl.hearushere.app.verwonderdduin.VerwonderdDuinService"
+            android:exported="false" />
+
+
     </application>
 
 </manifest>

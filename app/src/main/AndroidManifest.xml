@@ -16,10 +16,10 @@
             android:label="@string/app_credits" >
         </activity>
 
-        <service
-            android:name="nl.hearushere.app.HearUsHereService"
-            android:exported="false" />
-
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="2ebbefb1b3e7c4ed81e6beaa751b9d3032fc7440" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

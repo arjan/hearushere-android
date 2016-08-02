@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
         OnMapClickListener {
     protected SpiceManager mSpiceManager = new SpiceManager(
             HttpSpiceService.class);
-    public static final String TAG = HearUsHereService.class.getSimpleName();
+    public static final String TAG = VerwonderdDuinService.class.getSimpleName();
 
     private ServiceConnection mServiceConnection;
     protected nl.hearushere.lib.AudioWalkService.LocalBinder mServiceInterface;
@@ -393,7 +393,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
     }
 
     private void connectAudioService() {
-        Intent service = new Intent(this, HearUsHereService.class);
+        Intent service = new Intent(this, VerwonderdDuinService.class);
         startService(service);
 
         mServiceConnection = new ServiceConnection() {
