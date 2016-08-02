@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -15,6 +16,12 @@ import android.os.Message;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +42,7 @@ import nl.miraclethings.beaconlib.ZoneMap;
 
 /**
  * Controls the main hear-us-here algorithm
- * <p>
+ * <p/>
  * Created by Arjan Scherpenisse on 5-5-15.
  */
 public class HearUsHereAudioController implements BeaconScannerService.ServiceConnectedCallback, BeaconScannerService.IForegroundListener {
@@ -74,6 +81,8 @@ public class HearUsHereAudioController implements BeaconScannerService.ServiceCo
         mBeaconService = binder;
         mBeaconService.setForegroundListener(this);
         initializeBluetoothSounds();
+
+        logger.info("connected to beacon service");
     }
 
     @Override
@@ -136,7 +145,7 @@ public class HearUsHereAudioController implements BeaconScannerService.ServiceCo
         }
         if (mWalk.getSounds() != null) {
             for (Track track : mWalk.getSounds()) {
-                mVolumeHandler.removeMessages(track.getId());
+                mVolumeHandler.removeMessages(track.getTrackHash());
                 MediaPlayer mp = track.getMediaPlayer();
                 if (mp != null) {
                     mp.stop();
@@ -281,7 +290,11 @@ public class HearUsHereAudioController implements BeaconScannerService.ServiceCo
                 }
                 mp = buildMediaPlayer(track);
                 track.setMediaPlayer(mp);
-                Log.v(TAG, "Start track: " + track.getStreamUrl());
+
+                if (mp != null) {
+                    Log.v(TAG, "Start track: " + track.getStreamUrl());
+                    new NotifyTask(track).execute();
+                }
             }
             track.setCurrentVolume(v);
 
@@ -326,18 +339,18 @@ public class HearUsHereAudioController implements BeaconScannerService.ServiceCo
         }
 
         public void fadeToVolume(Track track, float v, int time) {
-            removeMessages(track.getId());
+            removeMessages(track.getTrackHash());
 
             float current = track.getCurrentVolume();
             float delta = (v - current) / (time / Constants.FADE_STEP);
             for (int t = 0; t < time; t += Constants.FADE_STEP) {
                 current += delta;
-                Message m = obtainMessage(track.getId(),
+                Message m = obtainMessage(track.getTrackHash(),
                         (int) (current * 1000), 0);
                 m.obj = track;
                 sendMessageDelayed(m, t);
             }
-            Message m = obtainMessage(track.getId(), (int) (v * 1000), 0);
+            Message m = obtainMessage(track.getTrackHash(), (int) (v * 1000), 0);
             m.obj = track;
             sendMessageDelayed(m, time);
         }
@@ -370,11 +383,14 @@ public class HearUsHereAudioController implements BeaconScannerService.ServiceCo
 
         ZoneMap m = new ZoneMap();
         for (Track t : mWalk.getBluetoothTracks()) {
-            String zoneId = String.valueOf(t.getId());
-            m.put(zoneId, createBeaconZone(t));
+            String zoneId = t.getId();
+            Zone z = createBeaconZone(t);
+            m.put(zoneId, z);
+            logger.info("ZoneId: {}, {}", zoneId, z.getBeacons().get(0).toString());
             mBluetoothTrackMap.put(zoneId, t);
         }
 
+        logger.info("Set zone map!");
         mBeaconService.setZoneMap(m);
     }
 
@@ -385,4 +401,31 @@ public class HearUsHereAudioController implements BeaconScannerService.ServiceCo
         return z;
     }
 
+    private class NotifyTask extends AsyncTask<Void, Void, Void> {
+        private Track track;
+
+        public NotifyTask(Track track) {
+            this.track = track;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                String postBody = new Gson().toJson(track.getListenerNotification(context, mBeaconService.getLastBeacon()));
+
+                Request request = new Request.Builder()
+                        .url(Constants.API_URL_PREFIX + "listeners")
+                        .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postBody))
+                        .build();
+
+                Response response = new OkHttpClient().newCall(request).execute();
+                logger.info("Posted listeners information: {}", response.toString());
+
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
 }

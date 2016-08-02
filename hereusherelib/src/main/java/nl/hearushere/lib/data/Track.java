@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.altbeacon.beacon.Beacon;
+
 import java.io.File;
 import java.io.Serializable;
 
@@ -151,8 +153,12 @@ public class Track implements Serializable {
         return file;
     }
 
-    public int getId() {
-        return getStreamUrl().hashCode();
+    public String getId() {
+        return file;
+    }
+
+    public int getTrackHash() {
+        return file.hashCode();
     }
 
     public String getUuid() {
@@ -179,4 +185,7 @@ public class Track implements Serializable {
         return url;
     }
 
+    public ListenerNotification getListenerNotification(Context context, Beacon lastBeacon) {
+        return isBluetooth() ? new BluetoothListenerNotification(context, this, lastBeacon) : new GeoListenerNotification(context, this);
+    }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Verwonderd duin</string>
+    <bool name="is_universal">false</bool>
+    
+    <color name="main_fg">#000000</color>
+    <color name="main_bg">#DB8732</color>
+
+    <color name="polygon_stroke">#000000</color>
+    <color name="polygon_fill">#33ffff00</color>
+    
+    <string name="fixed_walk_id">578544d1e77093a47f77beb6</string>
+
+</resources>

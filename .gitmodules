@@ -1,0 +1,3 @@
+[submodule "beacon_lib"]
+	path = beacon_lib
+	url = git@github.com:arjan/beacon_lib.git

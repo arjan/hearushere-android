@@ -9,6 +9,9 @@ android {
         extrapool {
             applicationId "nl.hearushere.app.extrapool"
         }
+        verwonderdduin {
+            applicationId "nl.hearushere.app.verwonderdduin"
+        }
     }
 
     signingConfigs {
@@ -21,14 +24,14 @@ android {
     }
 
     compileSdkVersion 21
-    buildToolsVersion "19.1.0"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
 
-        versionCode 230
-        versionName "2.3"
+        versionCode 240
+        versionName "2.4"
 
     }
 
