@@ -19,7 +19,7 @@ public class HearUsHereService extends nl.hearushere.lib.AudioWalkService {
 
     @Override
     public int getAppIcon() {
-        return R.drawable.ic_launcher;
+        return R.mipmap.ic_launcher;
     }
 
     @Override

@@ -166,7 +166,7 @@ public class HearUsHereAudioController implements BeaconScannerService.ServiceCo
 
         boolean insideMapArea = isInsideMapArea(location);
         if (!insideMapArea) {
-            callback.showNotification("You are too far away from the sounds, please move closer.");
+            callback.showNotification(context.getString(R.string.R_string_audio_too_far));
         } else {
             callback.hideNotification();
         }

@@ -20,18 +20,20 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 public class CreditsActivity extends Activity {
 
-	private Walk mWalk;
-	private WebView mWebView;
+    private Walk mWalk;
+    private WebView mWebView;
 
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.credits);
-		
-		mWalk = Utils.deserialize(getIntent().getStringExtra("credits"), Walk.class);
-		
-		getActionBar().setTitle(mWalk.getTitle());
+    /**
+     * Called when the activity is first created.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.credits);
+
+        mWalk = Utils.deserialize(getIntent().getStringExtra("credits"), Walk.class);
+
+        getActionBar().setTitle(mWalk.getTitle());
 
         if (mWalk.getImageUrl() != null) {
             ImageLoader.getInstance().loadImage(mWalk.getImageUrl(), new ImageLoadingListener() {
@@ -55,12 +57,14 @@ public class CreditsActivity extends Activity {
             });
         }
 
-		getActionBar().setHomeButtonEnabled(true);
+        if (getActionBar() != null) {
+            getActionBar().setHomeButtonEnabled(true);
+        }
 
-		mWebView = (WebView)findViewById(R.id.wv_credits);
-		
-		mWebView.loadUrl(mWalk.getCreditsUrl());
-	}
+        mWebView = (WebView) findViewById(R.id.wv_credits);
+
+        mWebView.loadUrl(mWalk.getCreditsUrl());
+    }
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -68,11 +72,11 @@ public class CreditsActivity extends Activity {
     }
 
     @Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == android.R.id.home) {
-			finish();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -1,4 +1,4 @@
-package nl.hearushere.app;
+package nl.hearushere.app.verwonderdduin;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -27,8 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,7 +39,6 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLoadedCallback;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.LatLngBounds.Builder;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -57,6 +56,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import nl.hearushere.app.CreditsActivity;
+import nl.hearushere.app.HearUsHereService;
 import nl.hearushere.app.main.BuildConfig;
 import nl.hearushere.app.main.R;
 import nl.hearushere.lib.Utils;
@@ -82,7 +83,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
     private View mProgress;
     private Marker mDebugMarker;
     private List<Walk> mWalks;
-    private Button mButton;
+    private ImageView mButton;
     private ViewPager mViewPager;
     private LocationManager mLocationManager;
     private boolean mIsUniversal;
@@ -194,6 +195,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
 
         mMap = getMapFragment().getMap();
         mMap.setMyLocationEnabled(true);
+        moveLocationButton();
         mMap.clear();
 
         if (useDebugLocation()) {
@@ -206,7 +208,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
 
                 List<ArrayList<LatLng>> pointsList = walk.getPoints();
 
-                Builder builder = new LatLngBounds.Builder();
+                Builder builder = new Builder();
 
                 // draw polygons on map
                 for (ArrayList<LatLng> points : pointsList) {
@@ -226,6 +228,23 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 80));
             }
         });
+    }
+
+    private void moveLocationButton() {
+        View mapView = getMapFragment().getView();
+        if (mapView != null &&
+                mapView.findViewById(1) != null) {
+            // Get the button view
+            View locationButton = ((View) mapView.findViewById(1).getParent()).findViewById(2);
+            // and next place it, on bottom right (as Google Maps app)
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                    locationButton.getLayoutParams();
+            // position on right bottom
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, 30, 30);
+        }
+
     }
 
     private MapFragment getMapFragment() {
@@ -275,7 +294,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
                 }
             });
         }
-        mButton = (Button) findViewById(R.id.button_start_stop);
+        mButton = (ImageView) findViewById(R.id.button_start_stop);
 
         invalidateOptionsMenu();
         walkSelected(0);
@@ -287,15 +306,9 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
 
         Walk current = mServiceInterface.getCurrentWalk();
         if (current == null || !walk.getTitle().equals(current.getTitle())) {
-            if (getActionBar() != null) {
-                getActionBar().setTitle(walk.getTitle());
-            }
-            mButton.setText("START");
+            mButton.setImageResource(R.drawable.start_button);
         } else {
-            if (getActionBar() != null) {
-                getActionBar().setTitle(getString(R.string.app_name));
-            }
-            mButton.setText("STOP");
+            mButton.setImageResource(R.drawable.stop_button);
         }
     }
 
@@ -488,6 +501,14 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
         Intent intent = new Intent(this, CreditsActivity.class);
         intent.putExtra("credits", Utils.serialize(walk, Walk.class));
         startActivity(intent);
+    }
+
+    public void clickInfo(View view) {
+        startActivity(new Intent(this, VerwonderdDuinCreditsActivity.class));
+    }
+
+    public void clickBack(View view) {
+        finish();
     }
 
     class WalksPagerAdapter extends PagerAdapter {

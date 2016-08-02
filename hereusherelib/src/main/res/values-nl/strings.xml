@@ -1,0 +1,7 @@
+<resources>
+    <string name="load_progress">Bestand %1$d van de %2$d aan het laden…</string>
+    <string name="notification_progress_text">De audiotour is bezig. Klik om te pauzeren.</string>
+    <string name="notification_progress_text_small">Audiotour is bezig.</string>
+    <string name="notification_not_started_text">De tour is klaar om te beginnen.</string>
+    <string name="R.string.audio_too_far">Je bent te ver weg van het gebied, ga a.u.b. meer naar het gebied toe.</string>
+</resources>

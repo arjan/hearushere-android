@@ -37,7 +37,6 @@ public abstract class AudioWalkService extends Service implements LocationListen
     private HearUsHereAudioController mHearUsHereAudioController;
     protected NotificationController mNotificationController;
 
-
     public interface AudioEventListener {
 
         void showNotification(String message);
