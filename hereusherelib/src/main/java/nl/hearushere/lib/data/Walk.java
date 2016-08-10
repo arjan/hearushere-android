@@ -24,7 +24,7 @@ public class Walk {
                     return w;
                 }
             }
-            return null;
+            throw new RuntimeException("Walk not found: " + id);
         }
 
     }

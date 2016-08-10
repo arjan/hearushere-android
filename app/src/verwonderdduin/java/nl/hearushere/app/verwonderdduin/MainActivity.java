@@ -262,7 +262,6 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
 
         System.out.println("-- init pager--");
         System.out.println("-- " + loc.getLatitude() + " " + loc.getLongitude());
-        sortWalksByClosestDistance(new LatLng(loc.getLatitude(), loc.getLongitude()));
 
         View container = findViewById(R.id.fl_walk_info);
         mViewPager = (ViewPager) findViewById(R.id.vp_walks);
@@ -271,6 +270,8 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
             container.setVisibility(View.GONE);
 
         } else {
+
+            sortWalksByClosestDistance(new LatLng(loc.getLatitude(), loc.getLongitude()));
 
             mViewPager.setAdapter(new WalksPagerAdapter());
             container.setVisibility(View.VISIBLE);
@@ -313,7 +314,8 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
     }
 
     public void clickStartStop(View v) {
-        Walk walk = mWalks.get(mViewPager.getCurrentItem());
+        if (mWalks == null || mWalks.size() < 1) return;
+        Walk walk = mWalks.size() == 1 ? mWalks.get(0) : mWalks.get(mViewPager.getCurrentItem());
         Walk current = mServiceInterface.getCurrentWalk();
         if (current == null || !walk.getTitle().equals(current.getTitle())) {
             if (walk.hasBluetooth() && getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
