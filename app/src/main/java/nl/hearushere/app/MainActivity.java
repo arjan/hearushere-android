@@ -125,7 +125,7 @@ public class MainActivity extends Activity implements nl.hearushere.lib.AudioWal
                 if (mIsUniversal) {
                     mWalks = walks;
                 } else {
-                    mWalks = Arrays.asList(walks.findById(getString(R.string.fixed_walk_id)));
+                    mWalks = Arrays.asList(walks.findByTitle(getString(R.string.fixed_walk_title)));
                 }
                 waitForLocation();
             }

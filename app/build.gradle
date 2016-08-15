@@ -45,8 +45,8 @@ android {
         minSdkVersion 15
         targetSdkVersion 21
 
-        versionCode 241
-        versionName "2.5"
+        versionCode 242
+        versionName "2.6"
 
     }
 

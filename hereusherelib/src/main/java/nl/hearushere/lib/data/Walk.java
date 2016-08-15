@@ -27,6 +27,15 @@ public class Walk {
             throw new RuntimeException("Walk not found: " + id);
         }
 
+        public Walk findByTitle(String title) {
+            for (Walk w : this) {
+                if (title.equals(w.getTitle())) {
+                    return w;
+                }
+            }
+            throw new RuntimeException("Walk not found (by title): " + title);
+        }
+
     }
 
     @JsonProperty("_id")
