@@ -3,5 +3,6 @@
 .idea
 *.iml
 .gradle
+app/release.keystore
 
 local.properties
